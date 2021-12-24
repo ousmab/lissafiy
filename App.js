@@ -21,7 +21,12 @@ const Stack = createNativeStackNavigator();
 
 function HomeScreen() {
   return (
-    <Tab.Navigator >
+    <Tab.Navigator tabBarOptions={{
+        style: {
+          elevation: 0, 
+        },
+      }}
+    >
         <Tab.Screen  name="activité" component={Activite}></Tab.Screen>
         <Tab.Screen  name="historique" component={Historique}></Tab.Screen>
         <Tab.Screen  name="tiers" component={Tiers}></Tab.Screen>
@@ -32,7 +37,7 @@ export default function App() {
   return (
     
     <SafeAreaProvider>
-        <NavigationContainer>
+        <NavigationContainer >
               <Stack.Navigator screenOptions={{headerShadowVisible: false}}>
                 <Stack.Screen 
                     name="Home"
