@@ -1,33 +1,53 @@
-import * as React from 'react';
-import { Text, View } from 'react-native';
+import React from 'react';
+import { Text, View , Button} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Activite from './components/Activite';
+import Historique from './components/Historique';
+import Tiers from './components/Tiers';
+
+const Tab = createMaterialTopTabNavigator();
+const Stack = createNativeStackNavigator();
+
+
+
+
+
+
+
+
 
 function HomeScreen() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Home!</Text>
-    </View>
+    <Tab.Navigator screenOptions={{textTransform: 'lowercase'}}>
+        <Tab.Screen  name="activité" component={Activite}></Tab.Screen>
+        <Tab.Screen  name="historique" component={Historique}></Tab.Screen>
+        <Tab.Screen  name="tiers" component={Tiers}></Tab.Screen>
+    </Tab.Navigator>
   );
 }
-
-function SettingsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings!</Text>
-    </View>
-  );
-}
-
-const Tab = createMaterialTopTabNavigator();
-
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    
+    <SafeAreaProvider>
+        <NavigationContainer>
+              <Stack.Navigator screenOptions={{headerShadowVisible: false}}>
+                <Stack.Screen 
+                    name="Home"
+                    component={HomeScreen}
+                    options={{ title: 'Lissafiy', headerStyle: {
+                     
+                   } }}
+                />
+                  
+              
+               
+              </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
+          
+    
   );
 }
