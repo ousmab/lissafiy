@@ -1,48 +1,45 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text} from 'react-native';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome5';
 
 
 function Sortie(){
   return (
-    <SafeAreaView>
-      <Text>bottom 1</Text>
+    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Operations de sortie :</Text>
     </SafeAreaView>
   )
 }
 
 function Entree(){
   return (
-    <SafeAreaView>
-      <Text>bottom 2</Text>
+    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Operations de d'entrée :</Text>
     </SafeAreaView>
   )
 }
 
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 
 function ActivityBottomTabs() {
   return (
-    <Tab.Navigator 
-      
-    screenOptions={{
-      tabBarOptions: {
-          style: {
-              backgroundColor: '#ccc',
-          },
-      },
-      tabBarBackground: '#cccccc'
-  }}
-    >
+    <Tab.Navigator screenOptions={{
+        headerShadowVisible: false,
+        tabBarActiveTintColor : "#000000",
+        tabBarActiveBackgroundColor :"#ebebeb",
+        tabBarInactiveTintColor : "#cccccc"
+
+      }}>
+
       <Tab.Screen name="Sortie" 
         component={Sortie} 
         options={{
           
-          tabBarIcon: (color) => (
+          tabBarIcon: ({color}) => (
             <FontAwesome name="sign-out-alt" color={color} size={25} />
           ),
-          style : {backgroundColor:'red'}
+         
         }}
         />
 

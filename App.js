@@ -21,7 +21,7 @@ const Stack = createNativeStackNavigator();
 
 function HomeScreen() {
   return (
-    <Tab.Navigator screenOptions={{textTransform: 'lowercase'}}>
+    <Tab.Navigator >
         <Tab.Screen  name="activité" component={Activite}></Tab.Screen>
         <Tab.Screen  name="historique" component={Historique}></Tab.Screen>
         <Tab.Screen  name="tiers" component={Tiers}></Tab.Screen>
