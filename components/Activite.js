@@ -11,14 +11,13 @@ function Sortie(){
 
   return (
     <SafeAreaView style={{ flex: 1}}>
-      <View style={{ flex: 1,backgroundColor: 'red' }} ></View>
-      <View style={{ flex: 4, alignItems: 'center' }} >
+      <View style={{ flex: 2,backgroundColor: 'red' }} ></View>
+      <View style={{ flex: 3, alignItems: 'center' }} >
 
         <DatePicker 
-          locale='fr'
-          style = {{ height: 120, width : 600, }}
-          androidVariant ="nativeAndroid"
-          mode={"date"}
+          style={{ height : 120}}
+          locale="fr"
+          androidVariant={'nativeAndroid'}
           date={date} 
           onDateChange={setDate} />
       </View>
