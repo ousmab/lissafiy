@@ -21,11 +21,11 @@ const Stack = createNativeStackNavigator();
 
 function HomeScreen() {
   return (
-    <Tab.Navigator tabBarOptions={{
-        style: {
-          elevation: 0, 
-        },
-      }}
+    <Tab.Navigator
+        screenOptions={{
+          tabBarLabelStyle: { fontSize: 13 },
+          tabBarStyle: { backgroundColor: '#fff', elevation:0 },
+        }}
     >
         <Tab.Screen  name="activité" component={Activite}></Tab.Screen>
         <Tab.Screen  name="historique" component={Historique}></Tab.Screen>
@@ -45,10 +45,7 @@ export default function App() {
                     options={{ title: 'Lissafiy', headerStyle: {
                      
                    } }}
-                />
-                  
-              
-               
+                /> 
               </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
