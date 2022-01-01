@@ -7,12 +7,7 @@ import { Icon } from 'react-native-elements';
 import ModalSelector from 'react-native-modal-selector'
 import TextField from 'rn-md-textinput';
 import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart
+  LineChart
 } from "react-native-chart-kit";
 
 
@@ -25,7 +20,7 @@ function Activite() {
     const [number, setNumber] = useState(1);
     const DATA = [
       {
-        title: " détails entrées",
+        title: " détails recettes",
         data: ["jour", "semaine", "mois","toutes"]
       }
     ];
@@ -38,7 +33,7 @@ function Activite() {
     ];
     const DATA3 = [
       {
-        title: " détails des sorties",
+        title: " détails des dépenses",
         data: ["jour", "semaine", "mois","toutes"]
       }
     ];
@@ -148,6 +143,7 @@ function Activite() {
                 <Text style={styles.header}>{title}</Text>
               )}
             />
+            
           </View>
            
           <View style={{ backgroundColor:"#fff"}}>
