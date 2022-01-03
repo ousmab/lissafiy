@@ -11,7 +11,7 @@ import Activite from './components/Activite';
 import Historique from './components/Historique';
 import Tiers from './components/Tiers';
 import { getAllCategory,insertCategory,getAllCategoryByType, CATEGORY_IN, CATEGORY_OUT, CATEGORY_DETTE, CATEGORY_PRET, createCategorieTable } from './databases/categoryModel';
-import { createOperationTable, getAllOperations } from './databases/operationModel';
+import { createOperationTable, getAllOperations, getAllDays } from './databases/operationModel';
 
 const Tab = createMaterialTopTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -19,24 +19,17 @@ const Stack = createNativeStackNavigator();
 
 function HomeScreen() { 
 
-    const [categories, setCategories] = useState()
+    const [operation_dates, setOperation_dates] = useState()
 
-    
+
     useEffect(() => {
 
+      console.log(operation_dates)
      
-     /*insertCategory(["emprunts",CATEGORY_IN, CATEGORY_DETTE ],  (result)=>{
-        console.log(result)
-      })
-
-      getAllCategoryByType(CATEGORY_IN,(categories)=>{
-        console.log("BONJOURR",categories)
-      })*/
-      
       return () => { 
         
       }
-    }, [])
+    }, [operation_dates])
 
   return (
     <Tab.Navigator
@@ -46,33 +39,35 @@ function HomeScreen() {
           tabBarStyle: { backgroundColor: '#fff', elevation:0 },
         }}
 
-        screenListeners={({ navigation }) => ({
+        screenListeners={({ navigation, route }) => ({
           state: (e) => {
             // Do something with the state
             let tab_index =  e.data.state.index;
 
             switch (tab_index) {
               case 0:// si on est sur le tab Activité
-                
+                  
                 break;
               
               case 1:// si on est sur le tab Historique
-                alert("index historique", tab_index)
+                console.log(tab_index)
+                getAllDays((dates)=>{
+                  setOperation_dates(dates)
+                })
+                
+                
               break;
             
+
               case 2: // si on est sur le tab Tiers
-              alert("index tiers", tab_index)
+              
               break;
+
 
               default:
                 break;
             }
-            // si on est a activité on recupere les somme et ce qui est a afficher sur le graphz
 
-            // si on es a historique on recuperer ce qui est a fficher a historique
-
-
-           
           },
         })}
     >
@@ -82,19 +77,10 @@ function HomeScreen() {
           
         <Tab.Screen  
           name="historique" 
-          component={Historique}
-          
-          listeners={({ navigation, route }) => ({
-            tab: (e) => {
-              // Prevent default action
-              console.log("historiqsss")
-              // Do something with the `navigation` object
-              navigation.navigate("activité");
-            },
-          })}
-
-          >
-
+         >
+            {
+              ()=> <Historique dates={operation_dates}/>
+            }
           </Tab.Screen>
 
         <Tab.Screen  
@@ -111,6 +97,7 @@ export default function App() {
   useEffect(() => {
     createCategorieTable()
     createOperationTable()
+   
     return () => {
       
     }
@@ -125,7 +112,7 @@ export default function App() {
                     name="Home"
                     component={HomeScreen}
                     options={{ title: 'Lissafiy', headerStyle: {
-                     
+                     fontSize:25
                    } }}
                 /> 
               </Stack.Navigator>

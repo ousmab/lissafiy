@@ -4,20 +4,20 @@ import { Text, View, FlatList,SectionList,TouchableOpacity ,StyleSheet, StatusBa
 import TabSelectorAnimation from 'react-native-tab-selector'
 import { CheckBox} from 'react-native-elements';
 import { getAllOperations, getAllDays,getAllOperationsByDate } from '../databases/operationModel'
+import { insertCategory, CATEGORY_IN, CATEGORY_OUT, CATEGORY_PRET, CATEGORY_DETTE } from '../databases/categoryModel';
+
 import EmptySectionList from './EmptySectionList';
 
 
-function Historique() {
-
-
-
+function Historique({dates}) {
+ 
 
   const [data, setData] = useState([])
-  const [dates, setDates] = useState([])
+  //const [dates, setDates] = useState([])
 
+  
 
   useEffect(() => {
-
 
     /*getAllOperationsByDate("2022-01-03",(operations)=>{
       console.log("opxxx", operations)
@@ -27,15 +27,13 @@ function Historique() {
       console.log("historique,", operations)
     })*/
 
-    getAllDays((dates)=>{
-        setDates(dates)
-    })
+  
 
     if(dates){
       let datas = []
       for(let i=0; i < dates.length ; i++){
         
-          console.log("date", dates[i])
+          
           getAllOperationsByDate(dates[i], (operations)=>{
             let operations_by = {
               title:dates[i],
@@ -43,12 +41,14 @@ function Historique() {
             }
             
             datas.push(operations_by)
-            // on ajoute au state
+            // on ajoute au state on prend l'ancien data
             
             
           })
+          
       }
-      setData(datas)
+      
+      setData([...datas,...data])
     }
 
    
@@ -66,7 +66,7 @@ function Historique() {
     return () => {
       
     }
-  }, [])
+  }, [dates])
 
   const [indexTab, setIndexTab] = useState(0)
   const DATA_TAB = [{ title: 'Tous' }, { title: 'semaine' }, { title: 'mois' }]
@@ -112,8 +112,6 @@ function Historique() {
         </View>
 
         <SectionList
-          style={{ marginTop:20}}
-
           sections={data}
           keyExtractor={item => item.id.toString() }
           renderItem={
