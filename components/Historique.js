@@ -1,42 +1,81 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, View, FlatList,SectionList,TouchableOpacity ,StyleSheet, StatusBar, Dimensions} from 'react-native';
 import TabSelectorAnimation from 'react-native-tab-selector'
 import { CheckBox} from 'react-native-elements';
+import { getAllOperations, getAllDays,getAllOperationsByDate } from '../databases/operationModel'
+import EmptySectionList from './EmptySectionList';
 
 
 function Historique() {
+
+
+
+
+  const [data, setData] = useState([])
+  const [dates, setDates] = useState([])
+
+
+  useEffect(() => {
+
+
+    /*getAllOperationsByDate("2022-01-03",(operations)=>{
+      console.log("opxxx", operations)
+    })*/
+    /*
+    getAllOperations((operations)=>{
+      console.log("historique,", operations)
+    })*/
+
+    getAllDays((dates)=>{
+        setDates(dates)
+    })
+
+    if(dates){
+      let datas = []
+      for(let i=0; i < dates.length ; i++){
+        
+          console.log("date", dates[i])
+          getAllOperationsByDate(dates[i], (operations)=>{
+            let operations_by = {
+              title:dates[i],
+              data: operations
+            }
+            
+            datas.push(operations_by)
+            // on ajoute au state
+            
+            
+          })
+      }
+      setData(datas)
+    }
+
+   
+    
+    /**
+     * {
+     *    "date operation",
+     *    [
+     *  {'id','label','categorie','montant'},{}   
+     * ]
+     * }
+     * 
+     */
+
+    return () => {
+      
+    }
+  }, [])
 
   const [indexTab, setIndexTab] = useState(0)
   const DATA_TAB = [{ title: 'Tous' }, { title: 'semaine' }, { title: 'mois' }]
  
   const [check1, setCheck1] = useState(false);
   const [check2, setCheck2] = useState(false);
-  const DATA = [
-    {
-      title: " Lundi : 25/12/2021",
-      data: ["Pizza", "Burger", "Risotto"]
-    },
-    {
-      title: " Mardi : 26/12/2021",
-      data: ["French Fries", "Onion Rings", "Fried Shrimps", "Onion Rings", "Fried Shrimps"]
-    }
-  ];
+ 
 
-  const Item = ({ title }) => (
-    <View style={styles.item}>
-       <TouchableOpacity
-        onPress={()=>alert('afficher un modal pour modifier la selection')}
-      >
-          <Text style={styles.title}>{title}</Text>
-      </TouchableOpacity>
-      
-    </View>
-  );
 
-  const renderItem = ({ item }) => (
-    <Item title={item.title} />
-  );
 
 
   return (
@@ -74,13 +113,29 @@ function Historique() {
 
         <SectionList
           style={{ marginTop:20}}
-          sections={DATA}
-          keyExtractor={(item, index) => item + index}
-          renderItem={({ item }) => <Item title={item} />}
-          renderSectionHeader={({ section: { title } }) => (
-            <Text style={styles.header}>{title}</Text>
-          )}
+
+          sections={data}
+          keyExtractor={item => item.id.toString() }
+          renderItem={
+            ({item})=>(
+              <View style={styles.item}>
+                <TouchableOpacity
+                  onPress={()=>alert('afficher un modal pour modifier la selection')}
+                >
+                    <Text style={styles.title}>{item.label}</Text>
+                </TouchableOpacity>
+                
+              </View>
+            )
+          }
+          renderSectionHeader={({section})=>{
+            return  <Text style={styles.header}>{section.title}</Text>
+          }}
+          ListEmptyComponent={<EmptySectionList />}
+          stickySectionHeadersEnabled
+
         />
+
     </SafeAreaView>
   );
 }
@@ -129,3 +184,5 @@ const styles = StyleSheet.create({
 });
 
 export default Historique;
+
+

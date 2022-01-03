@@ -1,4 +1,38 @@
 import { openDb } from "./dbConnexion"
+import moment from "moment"
+
+export  function createOperationTable(){
+    const db = openDb()
+    db.transaction(txn=>{
+        txn.executeSql(
+           `
+            CREATE TABLE IF NOT EXISTS "operations" (
+                "id"	INTEGER,
+                "date"	TEXT,
+                "category_id"	INTEGER,
+                "label"	TEXT,
+                "in_amount"	INTEGER,
+                "out_amount"	INTEGER,
+                "person"	TEXT,
+                PRIMARY KEY("id")
+            );
+            
+            `,
+            [],
+            (txn, results)=>{
+                
+            },
+
+            (error)=>{
+                //console.log(error,"creating results error")
+            }
+        )
+    })
+   
+}
+
+
+
 
 export function insertOperation(tabs, callback){
     // tabs = [date, category_id, label, in_amount, out_amount, person]
@@ -16,11 +50,109 @@ export function insertOperation(tabs, callback){
                 }
             },
             (error)=>{
-
+                alert(error)
             }
         )
     })
 }
+
+
+
+export function getAllDays(callback){
+    const db =  openDb()
+    let operations_dates = []
+
+    db.transaction(trs=>{
+        trs.executeSql(
+            `SELECT date  FROM operations  GROUP BY date ORDER BY date DESC ;`,
+            [],
+            (trs, results)=>{
+
+                if(results.rows.length>0){
+                  
+                    for(let i=0; i < results.rows.length; ++i){
+                        //let date_formated = String(moment(results.rows.item(i).date, 'YYYY-MM-DD').format('DD-MM-YYYY'));
+                        operations_dates.push(results.rows.item(i).date)
+                    }
+                    
+                    callback(operations_dates) 
+                    
+                }else{
+                    callback([])
+                }
+
+                
+            },
+            (error)=>{
+                console.log("error during selection ", error)
+            }
+        )
+    })
+
+    
+}
+export function getAllOperationsByDate(date,callback){
+    const db =  openDb()
+    let operations = []
+
+    db.transaction(trs=>{ //{'id','label','categorie','montant'}
+        trs.executeSql(
+            `
+            SELECT operations.id,
+                    operations.date, 
+                    operations.label, 
+                    category.name, 
+                    operations.in_amount, 
+                    operations.out_amount, 
+                    category.category_type,
+                    operations.person,
+                    category.type_debt  
+            FROM operations 
+            INNER JOIN 
+                category on operations.category_id=category.id
+            WHERE operations.date=?
+            ORDER BY operations.date DESC;
+            `,
+            [date],
+            (trs, results)=>{
+
+                if(results.rows.length>0){
+                  
+                    for(let i=0; i < results.rows.length; ++i){
+
+                        operations.push(
+                            {
+                            'id':results.rows.item(i).id,
+                            'date':results.rows.item(i).date,
+                            'label' :results.rows.item(i).label,
+                            'categorie':results.rows.item(i).name,
+                            'in_amount':results.rows.item(i).in_amount,
+                            'out_amount':results.rows.item(i).out_amount,
+                            'category_type':results.rows.item(i).category_type,
+                            'tiers':results.rows.item(i).person,
+                            'type_debt':results.rows.item(i).type_debt
+                            }
+                        )
+
+                    }
+                    
+                    callback(operations) 
+                    
+                }else{
+                    callback([])
+                }
+
+                
+            },
+            (error)=>{
+                console.log("error during selection ", error)
+            }
+        )
+    })
+
+    
+}
+
 
 export function getAllOperations(callback){
     const db =  openDb()
@@ -62,7 +194,7 @@ export function getAllOperations(callback){
                 
             },
             (error)=>{
-                //console.log("error during selection ", error)
+                console.log("error during selection ", error)
             }
         )
     })
