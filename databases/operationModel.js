@@ -154,16 +154,28 @@ export function getAllOperationsByDate(date,callback){
 }
 
 
-export function getAllOperations(callback){
+export function getAllLastNdaysOperations(nombre_jours,callback){
     const db =  openDb()
     let operations = []
 
-    db.transaction(trs=>{
+    db.transaction(trs=>{ //{'id','label','categorie','montant'}
         trs.executeSql(
-            `SELECT 
-            * FROM 
-            OPERATIONS 
-            ORDER BY datetime(date) DESC`,
+            `
+            SELECT operations.id,
+                    operations.date, 
+                    operations.label, 
+                    category.name, 
+                    operations.in_amount, 
+                    operations.out_amount, 
+                    category.category_type,
+                    operations.person,
+                    category.type_debt  
+            FROM operations 
+            INNER JOIN 
+                category on operations.category_id=category.id
+            WHERE operations.date > (SELECT DATE('now','localtime', '-${nombre_jours} day'));
+            ORDER BY operations.date DESC;
+            `,
             [],
             (trs, results)=>{
 
@@ -174,12 +186,146 @@ export function getAllOperations(callback){
                         operations.push(
                             {
                             'id':results.rows.item(i).id,
-                            'date' :results.rows.item(i).date,
-                            'categorie':results.rows.item(i).category_id,
-                            'label':results.rows.item(i).label,
+                            'date':results.rows.item(i).date,
+                            'label' :results.rows.item(i).label,
+                            'categorie':results.rows.item(i).name,
                             'in_amount':results.rows.item(i).in_amount,
                             'out_amount':results.rows.item(i).out_amount,
-                            'tiers':results.rows.item(i).person
+                            'category_type':results.rows.item(i).category_type,
+                            'tiers':results.rows.item(i).person,
+                            'type_debt':results.rows.item(i).type_debt
+                            }
+                        )
+
+                    }
+                    
+                    // je recupere les 7 derniers jours
+                    let tab_jours = []
+                    for(let i=0 ; i<=nombre_jours-1; i++){
+                        let dateFrom = moment().subtract(i,'d').format('YYYY-MM-DD');
+                        tab_jours.push(dateFrom)
+                    }
+                    
+                    callback(operations,tab_jours) 
+                    
+                }else{
+                    callback([])
+                }
+
+                
+            },
+            (error)=>{
+                console.log("error during selection ", error)
+            }
+        )
+    })
+
+    
+}
+
+
+export function getAllOperationsTiers(callback){
+    const db =  openDb()
+    let operations = []
+
+    db.transaction(trs=>{ //{'id','label','categorie','montant'}
+        trs.executeSql(
+            `
+            SELECT operations.id,
+                    operations.date, 
+                    operations.label, 
+                    category.name, 
+                    operations.in_amount, 
+                    operations.out_amount, 
+                    category.category_type,
+                    operations.person,
+                    category.type_debt  
+            FROM operations 
+            INNER JOIN 
+                category on operations.category_id=category.id
+            WHERE category.type_debt =1 or category.type_debt =2
+            ORDER BY operations.date DESC;
+            `,
+            [],
+            (trs, results)=>{
+
+                if(results.rows.length>0){
+                  
+                    for(let i=0; i < results.rows.length; ++i){
+
+                        operations.push(
+                            {
+                            'id':results.rows.item(i).id,
+                            'date':results.rows.item(i).date,
+                            'label' :results.rows.item(i).label,
+                            'categorie':results.rows.item(i).name,
+                            'in_amount':results.rows.item(i).in_amount,
+                            'out_amount':results.rows.item(i).out_amount,
+                            'category_type':results.rows.item(i).category_type,
+                            'tiers':results.rows.item(i).person,
+                            'type_debt':results.rows.item(i).type_debt
+                            }
+                        )
+
+                    }
+                    
+                    callback(operations) 
+                    
+                }else{
+                    callback([])
+                }
+
+                
+            },
+            (error)=>{
+                console.log("error during selection ", error)
+            }
+        )
+    })
+
+    
+}
+
+
+export function getAllOperations(callback){
+    const db =  openDb()
+    let operations = []
+
+    db.transaction(trs=>{ //{'id','label','categorie','montant'}
+        trs.executeSql(
+            `
+            SELECT operations.id,
+                    operations.date, 
+                    operations.label, 
+                    category.name, 
+                    operations.in_amount, 
+                    operations.out_amount, 
+                    category.category_type,
+                    operations.person,
+                    category.type_debt  
+            FROM operations 
+            INNER JOIN 
+                category on operations.category_id=category.id
+            ORDER BY operations.date DESC;
+            `,
+            [],
+            (trs, results)=>{
+
+                if(results.rows.length>0){
+                  
+                    for(let i=0; i < results.rows.length; ++i){
+
+                        operations.push(
+                            {
+                            'id':results.rows.item(i).id,
+                            'date':results.rows.item(i).date,
+                            'label' :results.rows.item(i).label,
+                            'categorie':results.rows.item(i).name,
+                            'in_amount':results.rows.item(i).in_amount,
+                            'out_amount':results.rows.item(i).out_amount,
+                            'category_type':results.rows.item(i).category_type,
+                            'tiers':results.rows.item(i).person,
+                            'type_debt':results.rows.item(i).type_debt
                             }
                         )
 

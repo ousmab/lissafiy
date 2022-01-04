@@ -4,7 +4,7 @@ export  function  openDb(){
     //SQLite.enablePromise(true)
     //SQLite.enablePromise(true);
     return SQLite.openDatabase(
-        {name: 'lissafiyxx.db', location: 'default'}, 
+        {name: 'lissa.db', location: 'default'}, 
         (success)=>{
             //console.log("success ", success)
         }, 

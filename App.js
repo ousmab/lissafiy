@@ -11,7 +11,7 @@ import Activite from './components/Activite';
 import Historique from './components/Historique';
 import Tiers from './components/Tiers';
 import { getAllCategory,insertCategory,getAllCategoryByType, CATEGORY_IN, CATEGORY_OUT, CATEGORY_DETTE, CATEGORY_PRET, createCategorieTable } from './databases/categoryModel';
-import { createOperationTable, getAllOperations, getAllDays } from './databases/operationModel';
+import { createOperationTable, getAllOperations, getAllDays, getAllLastNdaysOperations } from './databases/operationModel';
 
 const Tab = createMaterialTopTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -20,11 +20,13 @@ const Stack = createNativeStackNavigator();
 function HomeScreen() { 
 
     const [operation_dates, setOperation_dates] = useState()
-
+    const [tiers_type, setTiers_type] = useState([1,2])
 
     useEffect(() => {
 
-      console.log(operation_dates)
+      getAllLastNdaysOperations(4,(operations,tab_jours)=>{
+        console.log("les 3 derniers jours ", tab_jours,operations )
+      })
      
       return () => { 
         
@@ -33,7 +35,9 @@ function HomeScreen() {
 
   return (
     <Tab.Navigator
-    
+        onIndexChange={(index)=>{
+            console.log("on a changer ,",index)
+        }}
         screenOptions={{
           tabBarLabelStyle: { fontSize: 13, fontWeight:'bold' },
           tabBarStyle: { backgroundColor: '#fff', elevation:0 },
@@ -60,9 +64,13 @@ function HomeScreen() {
             
 
               case 2: // si on est sur le tab Tiers
-              
-              break;
+                  /*console.log(tab_index)
 
+                  le tiers est sois 1 soit 2
+                  getAllTiersType((dates)=>{
+                    setOperation_dates(dates)
+                  })*/
+              break;
 
               default:
                 break;
@@ -73,7 +81,11 @@ function HomeScreen() {
     >
         <Tab.Screen  
           name="activité" 
-          component={Activite}></Tab.Screen>
+          >
+            {
+              ()=><Activite />
+            }
+          </Tab.Screen>
           
         <Tab.Screen  
           name="historique" 
@@ -85,9 +97,12 @@ function HomeScreen() {
 
         <Tab.Screen  
           name="tiers" 
-          component={Tiers}
-          //options={{tabBarIcon:<Icon name="facebook" /> }}
-          ></Tab.Screen>
+           >
+            {
+              ()=> <Tiers type_tiers = {tiers_type} /> 
+            }
+
+          </Tab.Screen>
           
     </Tab.Navigator>
   );

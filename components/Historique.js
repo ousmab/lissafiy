@@ -5,6 +5,8 @@ import TabSelectorAnimation from 'react-native-tab-selector'
 import { CheckBox} from 'react-native-elements';
 import { getAllOperations, getAllDays,getAllOperationsByDate } from '../databases/operationModel'
 import { insertCategory, CATEGORY_IN, CATEGORY_OUT, CATEGORY_PRET, CATEGORY_DETTE } from '../databases/categoryModel';
+import { getSectionListDataStructure } from '../utils';
+
 
 import EmptySectionList from './EmptySectionList';
 
@@ -13,13 +15,18 @@ function Historique({dates}) {
  
 
   const [data, setData] = useState([])
-  //const [dates, setDates] = useState([])
+  const [dates_operations, setDates_operations] = useState([])
 
   
 
   useEffect(() => {
 
-    /*getAllOperationsByDate("2022-01-03",(operations)=>{
+    /*insertCategory(["prêts au gens", CATEGORY_OUT, CATEGORY_PRET],(result)=>{
+
+        console.log("categorie",result)
+    })
+   
+    getAllOperationsByDate("2022-01-03",(operations)=>{
       console.log("opxxx", operations)
     })*/
     /*
@@ -27,28 +34,20 @@ function Historique({dates}) {
       console.log("historique,", operations)
     })*/
 
-  
+    setDates_operations(dates)
 
     if(dates){
-      let datas = []
-      for(let i=0; i < dates.length ; i++){
-        
-          
-          getAllOperationsByDate(dates[i], (operations)=>{
-            let operations_by = {
-              title:dates[i],
-              data: operations
-            }
-            
-            datas.push(operations_by)
-            // on ajoute au state on prend l'ancien data
-            
-            
-          })
-          
-      }
-      
-      setData([...datas,...data])
+
+
+      getAllOperations((data)=>{
+
+        let structured_data = getSectionListDataStructure('date',dates,data)
+        setData(structured_data)
+      })
+
+    }else{ 
+
+      // aficher une chargeur loading...
     }
 
    
@@ -66,7 +65,7 @@ function Historique({dates}) {
     return () => {
       
     }
-  }, [dates])
+  }, [])
 
   const [indexTab, setIndexTab] = useState(0)
   const DATA_TAB = [{ title: 'Tous' }, { title: 'semaine' }, { title: 'mois' }]
@@ -82,17 +81,23 @@ function Historique({dates}) {
     <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       
       <View style={styles.tab_container}>
+          {/*
+          * SELECTION DES TOUTS MOIS SEMAINE
+          ----------------------------------
           <TabSelectorAnimation
             onChangeTab={setIndexTab}
             style={styles.tabSelector}
             tabs={DATA_TAB}
-          />
+          />*/}
           
             
 
           <View style={{ flexDirection:'row', alignItems:'flex-start', justifyContent:'center' }}>
+         
+         {/*
           <CheckBox
-                
+                SELECTION DES ENTREE OU DES SORTIES
+                 ----------------------------------
                 title="sorties"
                 checked={check1}
                 onPress={() => setCheck1(!check1)}
@@ -107,6 +112,9 @@ function Historique({dates}) {
                 textStyle={{fontSize :12, color:"green" }}
                 containerStyle={{flex : 1}}
               />
+         
+         
+         */}
           </View>
           
         </View>
@@ -144,13 +152,13 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight || 0,
   },
   item: {
-    borderBottomWidth:1,
+    
     borderBottomColor:"#ccc",
     backgroundColor: '#fff',
     padding: 20,
-    marginVertical: 0,
+    marginVertical: 1,
     marginHorizontal: 0,
-    elevation:1,
+    elevation:0,
     width : Dimensions.get('window').width-5
   },
     header: {
@@ -165,8 +173,6 @@ const styles = StyleSheet.create({
     color: '#4e4f4f'
   },
   tab_container: {
-    
-    paddingTop : 20,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor:"#fff"

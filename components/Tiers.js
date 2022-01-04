@@ -1,9 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text,View,Dimensions, StyleSheet, SectionList, StatusBar, TouchableOpacity} from 'react-native';
 import TabSelectorAnimation from 'react-native-tab-selector'
+import {getAllOperationsTiers } from "../databases/operationModel"
+import { getSectionListDataStructure } from '../utils';
+import EmptySectionList from './EmptySectionList';
 
-const DATA = [
+/*const DATA = [
   {
     title: " Les dettes : 45000",
     data: ["Pizza", "Burger", "Risotto"]
@@ -12,13 +15,37 @@ const DATA = [
     title: " les prêts",
     data: ["French Fries", "Onion Rings", "Fried Shrimps", "Onion Rings", "Fried Shrimps"]
   }
-];
+];*/
 
-const DATA_TAB = [{ title: 'Tous' }, { title: 'semaine' }, { title: 'mois' }]
+//const DATA_TAB = [{ title: 'Tous' }, { title: 'semaine' }, { title: 'mois' }]
 
-function Tiers() {
+function Tiers({type_tiers}) {
 
-  const [indexTab, setIndexTab] = useState(0)
+  const [data, setData] = useState()
+  
+  
+
+
+  useEffect(() => {
+    if(type_tiers){
+
+
+      getAllOperationsTiers((operations)=>{
+  
+        let structured_data = getSectionListDataStructure('type_debt',type_tiers,operations)
+        setData(structured_data)
+      })
+  
+    }else{ 
+  
+      // aficher une chargeur loading...
+    }
+    return () => {
+      
+    }
+  }, [])
+
+  //const [indexTab, setIndexTab] = useState(0)
 
   const Item = ({ title }) => (
     <View style={styles.item}>
@@ -36,21 +63,45 @@ function Tiers() {
     <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
         <View style={styles.tab_container}>
+
+         {
+          /*
+          SELCTION TOUT SEMAINE ET MOIS
+          ----------------------------
           <TabSelectorAnimation
-            onChangeTab={setIndexTab}
-            style={styles.tabSelector}
-            tabs={DATA_TAB}
+              onChangeTab={setIndexTab}
+              style={styles.tabSelector}
+              tabs={DATA_TAB}
           />
-          <Text style={styles.text}>{`Current tab is ${indexTab + 1}`}</Text>
+         
+
+          <Text style={styles.text}>{`Current tab is ${indexTab + 1}`}</Text>*/}
+
+
         </View>
         <SectionList
-          sections={DATA}
-          keyExtractor={(item, index) => item + index}
-          renderItem={({ item }) => <Item title={item} />}
-          renderSectionHeader={({ section: { title } }) => (
-            <Text style={styles.header}>{title}</Text>
-          )}
+          sections={data}
+          keyExtractor={item => item.id.toString() }
+          renderItem={
+            ({item})=>(
+              <View style={styles.item}>
+                <TouchableOpacity
+                  onPress={()=>alert('afficher un modal pour modifier la selection')}
+                >
+                    <Text style={styles.title}>{item.label}</Text>
+                </TouchableOpacity>
+                
+              </View>
+            )
+          }
+          renderSectionHeader={({section})=>{
+            return  <Text style={styles.header}>{section.title== 1 ? 'Emprunts' : 'Prêts' }</Text>
+          }}
+          ListEmptyComponent={<EmptySectionList />}
+          stickySectionHeadersEnabled
+
         />
+
     </SafeAreaView>
   );
 }
@@ -78,7 +129,7 @@ const styles = StyleSheet.create({
     color: '#4e4f4f'
   },
   tab_container: {
-    paddingTop : 20,
+    
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor:"#fff"

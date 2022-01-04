@@ -13,11 +13,11 @@ import {
   LineChart
 } from "react-native-chart-kit";
 import { CATEGORY_OUT, CATEGORY_IN, getAllCategoryByType } from '../databases/categoryModel';
-import {insertOperation } from '../databases/operationModel'
+import {getAllDays, insertOperation } from '../databases/operationModel'
 
 
 
-function Activite() {
+function Activite({setOperation_dates}) {
 
     
     const [modalVisible, setModalVisible] = useState(false)
@@ -401,12 +401,13 @@ function Activite() {
 
                       setonChangeMontant("")
                       setonChangeNature("")
-                      setonChangeTiers(null)
-                     
+                      setonChangeTiers("")
+
                   }else{
-                    alert("dd")
+                   Alert.alert("Echec","echec d'enregistrement !")
                   }
                 })
+               
               } }
             />
 
