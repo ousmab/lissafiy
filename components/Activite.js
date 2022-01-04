@@ -12,8 +12,9 @@ import moment from 'moment';
 import {
   LineChart
 } from "react-native-chart-kit";
-import { CATEGORY_OUT, CATEGORY_IN, getAllCategoryByType } from '../databases/categoryModel';
-import {getAllDays, insertOperation } from '../databases/operationModel'
+import { CATEGORY_OUT, CATEGORY_IN, getAllCategoryByType, CATEGORY_DETTE } from '../databases/categoryModel';
+import {getAllDays, insertOperation , getAllLastNdaysOperations, getSumInOrOout, getSumTypeDebt } from '../databases/operationModel'
+import { getDatasets } from '../utils';
 
 
 
@@ -39,11 +40,26 @@ function Activite({setOperation_dates}) {
       const [onChangeMontant, setonChangeMontant] = useState()
       const [onChangeNature, setonChangeNature] = useState()
       const [onChangeTiers, setonChangeTiers] = useState()
-      
+      const [displayingDataChart, setDisplayingDataChart] = useState()
       
       useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
         
+        
+        getAllLastNdaysOperations(7,(operations, days_arry)=>{
+            setDisplayingDataChart(getDatasets(operations, days_arry.reverse()))
+        })
+
+       // criteria = 'day' , 'week' ,'month' ,'all'
+       getSumInOrOout(CATEGORY_OUT,"all", (somme)=>{
+          console.log("charges et rectt ",somme)
+       })
+
+
+       getSumTypeDebt(CATEGORY_DETTE,0,(result)=>{
+         console.log("type dettes" ,result)
+       })
+
         console.log("montant : ",onChangeMontant,"nature : ",onChangeNature,"tiers : ",onChangeTiers, "oT>",tiers_operation)
         
         console.log(category_selected,"bravo")
@@ -71,7 +87,8 @@ function Activite({setOperation_dates}) {
           onChangeTiers,
           category_selected,
           tiers_operation,
-          operation_type 
+          operation_type ,
+          //displayingDataChart
         ])
 
     const DATA = [
@@ -126,35 +143,21 @@ function Activite({setOperation_dates}) {
        * 
        */}
     <ScrollView > 
-        <Text style={{ fontSize:25, color :"#a2a5a6", margin :20 }}>Evolution des flux</Text>
+        <Text style={{ fontSize:25, color :"#a2a5a6", margin :10 }}>Evolution des flux</Text>
       
-            <LineChart
+            {
+              
+            displayingDataChart &&  <LineChart
               data={{
-                labels: ["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.","dim."],
-                legend: ["sorties","entrées"] ,// optional,
+                labels:displayingDataChart['dates'].map(date=>moment(date).format('ddd')) ,
+                legend: ["sorties","entrées"] ,// optional, 
                 datasets: [
                   {
-                    data: [
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100
-                    ],
+                    data: displayingDataChart['out'] ,
                     color: (opacity = 1) => `rgba(184, 7, 48)`
                   },
                   {
-                    data: [
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100
-                    ],
+                    data:displayingDataChart['in'] ,
                     color: (opacity = 1) => `rgba(7, 184, 48)`
                   }
                 ]
@@ -191,7 +194,7 @@ function Activite({setOperation_dates}) {
                 
               }}
               />
-         
+            }
         <View style={{ backgroundColor:"#fff", marginRight:10, marginLeft:10 }}>
           <SectionList
             style={{ marginTop:20}}

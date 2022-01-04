@@ -52,5 +52,136 @@ export function getSectionListDataStructure(criteria,sectionTitleCriteria, dataT
         
     }
 
-	return {'date': dates, 'entree':sum_in_by_date,'sortie':sum_out_by_date}
+	return {'dates': dates, 'in':sum_in_by_date,'out':sum_out_by_date}
 }
+
+
+/**
+ * 
+ * 
+ * const data = [
+    {
+       "categorie":"nutrition",
+       "category_type":2,
+       "date":"2022-01-04",
+       "id":3,
+       "in_amount":0,
+       "label":"Pain chocolat",
+       "out_amount":250,
+       "tiers":null,
+       "type_debt":null
+    },
+ 
+    {
+       "categorie":"nutrition",
+       "category_type":2,
+       "date":"2022-01-04",
+       "id":1,
+       "in_amount":0,
+       "label":"Spaghetti matin",
+       "out_amount":500,
+       "tiers":null,
+       "type_debt":null
+    },
+    {
+       "categorie":"pourboires",
+       "category_type":1,
+       "date":"2022-01-03",
+       "id":2,
+       "in_amount":600,
+       "label":"Colgate",
+       "out_amount":0,
+       "tiers":null,
+       "type_debt":null
+    },
+    {
+       "categorie":"emprunts",
+       "category_type":1,
+       "date":"2022-01-03",
+       "id":4,
+       "in_amount":500,
+       "label":"Emprunts chez ouva",
+       "out_amount":0,
+       "tiers":"Ouba",
+       "type_debt":1
+
+},
+ 
+{
+   "categorie":"entrée",
+   "category_type":2,
+   "date":"2022-01-03",
+   "id":1,
+   "in_amount":0,
+   "label":"Spaghetti matin",
+   "out_amount":800,
+   "tiers":null,
+   "type_debt":null
+},
+ 
+{
+   "categorie":"nutrition",
+   "category_type":2,
+   "date":"2022-01-01",
+   "id":1,
+   "in_amount":0,
+   "label":"Spaghetti matin",
+   "out_amount":500,
+   "tiers":null,
+   "type_debt":null
+},
+ 
+{
+   "categorie":"nutrition",
+   "category_type":2,
+   "date":"2021-12-31",
+   "id":1,
+   "in_amount":0,
+   "label":"Spaghetti matin",
+   "out_amount":500,
+   "tiers":null,
+   "type_debt":null
+},
+ 
+{
+   "categorie":"nutrition",
+   "category_type":2,
+   "date":"2021-12-30",
+   "id":1,
+   "in_amount":0,
+   "label":"Spaghetti matin",
+   "out_amount":500,
+   "tiers":null,
+   "type_debt":null
+},
+ 
+{
+   "categorie":"entrée",
+   "category_type":1,
+   "date":"2021-12-29",
+   "id":1,
+   "in_amount":1500,
+   "label":"Spaghetti matin",
+   "out_amount":0,
+   "tiers":null,
+   "type_debt":null
+},
+ 
+{
+   "categorie":"sortie",
+   "category_type":2,
+   "date":"2021-12-29",
+   "id":1,
+   "in_amount":0,
+   "label":"Spaghetti matin",
+   "out_amount":7000,
+   "tiers":null,
+   "type_debt":null
+}
+
+]
+
+
+
+let dates = ["2022-01-04","2022-01-03","2022-01-02","2022-01-01"]
+ */

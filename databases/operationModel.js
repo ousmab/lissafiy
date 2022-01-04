@@ -1,6 +1,8 @@
 import { openDb } from "./dbConnexion"
 import moment from "moment"
 
+
+
 export  function createOperationTable(){
     const db = openDb()
     db.transaction(txn=>{
@@ -54,6 +56,103 @@ export function insertOperation(tabs, callback){
             }
         )
     })
+}
+
+export function getSumInOrOout(category_type,criteria,callback){
+
+    //criteria = 'day' , 'week' ,'month' ,'all'
+
+    let critere = ''
+    switch (criteria) {
+        case 'day':
+            critere = "WHERE operations.date = DATE('now','localtime') AND "
+            break;
+        case 'week':
+            critere = "WHERE operations.date > (SELECT DATE('now','localtime', '-7 day')) AND "
+            break;
+        case 'month':
+            critere = "WHERE strftime('%m',operations.date) =  strftime('%m',DATE('now','localtime')) AND "
+            break;
+        case 'all':
+            critere = ' WHERE '
+            break;
+        default:
+            break;
+    }
+
+    const db =  openDb()
+    
+
+    db.transaction(trs=>{ //{'id','label','categorie','montant'}
+        trs.executeSql(
+            `
+            SELECT 	 
+		    sum(operations.out_amount) as somme
+            FROM operations 
+            INNER JOIN 
+            category on operations.category_id=category.id
+            ${critere} 
+             category.category_type=? and (category.type_debt is null or category.type_debt= "") 
+            `,
+            [category_type],
+            (trs, results)=>{
+
+                if(results.rows.length>0){
+                    
+                    let somme =  results.rows.item(0).somme ? results.rows.item(0).somme : 0
+                    callback(somme)
+                    
+                }else{
+                    callback(0)
+                }
+
+                
+            },
+            (error)=>{
+                console.log("error during selection ", error)
+            }
+        )
+    })
+
+    
+}
+
+export function getSumTypeDebt(type_debt,criteria,callback){
+    const db =  openDb()
+    
+
+    db.transaction(trs=>{ //{'id','label','categorie','montant'}
+        trs.executeSql(
+            `
+            SELECT 	 
+		    sum(operations.out_amount) as somme
+            FROM operations 
+            INNER JOIN 
+            category on operations.category_id=category.id
+            WHERE operations.date = DATE('now','localtime') 
+                and category.category_type=? and (category.type_debt is null or category.type_debt= "") 
+            `,
+            [type_debt],
+            (trs, results)=>{
+
+                if(results.rows.length>0){
+                    
+                    let somme =  results.rows.item(0).somme ? results.rows.item(0).somme : 0
+                    callback(somme)
+                    
+                }else{
+                    callback(0)
+                }
+
+                
+            },
+            (error)=>{
+                console.log("error during selection ", error)
+            }
+        )
+    })
+
+    
 }
 
 

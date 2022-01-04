@@ -21,7 +21,7 @@ function Historique({dates}) {
 
   useEffect(() => {
 
-    /*insertCategory(["prêts au gens", CATEGORY_OUT, CATEGORY_PRET],(result)=>{
+    /*insertCategory(["Emprunts", CATEGORY_IN, CATEGORY_DETTE],(result)=>{
 
         console.log("categorie",result)
     })

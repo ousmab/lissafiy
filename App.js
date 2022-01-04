@@ -31,7 +31,9 @@ function HomeScreen() {
       return () => { 
         
       }
-    }, [operation_dates])
+    }, [
+      //operation_dates ENGENDRE UNE MISE A JOUR
+    ])
 
   return (
     <Tab.Navigator
