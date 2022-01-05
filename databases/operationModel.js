@@ -117,7 +117,28 @@ export function getSumInOrOout(category_type,criteria,callback){
     
 }
 
-export function getSumTypeDebt(type_debt,criteria,callback){
+export function getSumTypeDebt(category_type,criteria,callback){
+
+    //criteria = 'day' , 'week' ,'month' ,'all'
+
+    let critere = ''
+    switch (criteria) {
+        case 'day':
+            critere = "WHERE operations.date = DATE('now','localtime') AND "
+            break;
+        case 'week':
+            critere = "WHERE operations.date > (SELECT DATE('now','localtime', '-7 day')) AND "
+            break;
+        case 'month':
+            critere = "WHERE strftime('%m',operations.date) =  strftime('%m',DATE('now','localtime')) AND "
+            break;
+        case 'all':
+            critere = ' WHERE '
+            break;
+        default:
+            break;
+    }
+
     const db =  openDb()
     
 
@@ -129,10 +150,10 @@ export function getSumTypeDebt(type_debt,criteria,callback){
             FROM operations 
             INNER JOIN 
             category on operations.category_id=category.id
-            WHERE operations.date = DATE('now','localtime') 
-                and category.category_type=? and (category.type_debt is null or category.type_debt= "") 
+            ${critere} 
+             category.category_type=? and (category.type_debt is null or category.type_debt= "") 
             `,
-            [type_debt],
+            [category_type],
             (trs, results)=>{
 
                 if(results.rows.length>0){

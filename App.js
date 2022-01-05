@@ -1,136 +1,108 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View , Button} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { View , Text } from 'react-native';
+
+import HomeScreen from './components/HomeScreen';
+import Menu from './components/Menu';
+import CategoryAdd from "./components/CategoryAdd"
+import CategoryDetails from "./components/CategoryDetails"
+import About from "./components/About"
 
 
+import { createCategorieTable } from './databases/categoryModel';
+import { createOperationTable} from './databases/operationModel';
 
-import Activite from './components/Activite';
-import Historique from './components/Historique';
-import Tiers from './components/Tiers';
-import { getAllCategory,insertCategory,getAllCategoryByType, CATEGORY_IN, CATEGORY_OUT, CATEGORY_DETTE, CATEGORY_PRET, createCategorieTable } from './databases/categoryModel';
-import { createOperationTable, getAllOperations, getAllDays, getAllLastNdaysOperations } from './databases/operationModel';
-
-const Tab = createMaterialTopTabNavigator();
+import Icon from "react-native-vector-icons/FontAwesome"
 const Stack = createNativeStackNavigator();
 
-
-function HomeScreen() { 
-
-    const [operation_dates, setOperation_dates] = useState()
-    const [tiers_type, setTiers_type] = useState([1,2])
-
-    useEffect(() => {
-
-      getAllLastNdaysOperations(4,(operations,tab_jours)=>{
-        console.log("les 3 derniers jours ", tab_jours,operations )
-      })
-     
-      return () => { 
-        
-      }
-    }, [
-      //operation_dates ENGENDRE UNE MISE A JOUR
-    ])
+const Home=()=>{
 
   return (
-    <Tab.Navigator
-        onIndexChange={(index)=>{
-            console.log("on a changer ,",index)
-        }}
-        screenOptions={{
-          tabBarLabelStyle: { fontSize: 13, fontWeight:'bold' },
-          tabBarStyle: { backgroundColor: '#fff', elevation:0 },
-        }}
-
-        screenListeners={({ navigation, route }) => ({
-          state: (e) => {
-            // Do something with the state
-            let tab_index =  e.data.state.index;
-
-            switch (tab_index) {
-              case 0:// si on est sur le tab Activité
-                  
-                break;
-              
-              case 1:// si on est sur le tab Historique
-                console.log(tab_index)
-                getAllDays((dates)=>{
-                  setOperation_dates(dates)
-                })
-                
-                
-              break;
-            
-
-              case 2: // si on est sur le tab Tiers
-                  /*console.log(tab_index)
-
-                  le tiers est sois 1 soit 2
-                  getAllTiersType((dates)=>{
-                    setOperation_dates(dates)
-                  })*/
-              break;
-
-              default:
-                break;
-            }
-
-          },
-        })}
-    >
-        <Tab.Screen  
-          name="activité" 
-          >
-            {
-              ()=><Activite />
-            }
-          </Tab.Screen>
-          
-        <Tab.Screen  
-          name="historique" 
-         >
-            {
-              ()=> <Historique dates={operation_dates}/>
-            }
-          </Tab.Screen>
-
-        <Tab.Screen  
-          name="tiers" 
-           >
-            {
-              ()=> <Tiers type_tiers = {tiers_type} /> 
-            }
-
-          </Tab.Screen>
-          
-    </Tab.Navigator>
-  );
+    <View>
+      <Text>Autres</Text>
+    </View>
+  )
 }
-export default function App() {
+
+export default function App({ navigation }) {
+
+  
+  const [visible, setVisible] = useState(false);
+  const toggleOverlay = () => {
+    setVisible(!visible);
+  };
 
   useEffect(() => {
+   
     createCategorieTable()
     createOperationTable()
    
     return () => {
-      
+
     }
   }, [])
 
   return (
     
     <SafeAreaProvider>
+        
         <NavigationContainer >
+              <Menu toggle={toggleOverlay}  visible={visible} />
               <Stack.Navigator screenOptions={{headerShadowVisible: false}}>
                 <Stack.Screen 
                     name="Home"
                     component={HomeScreen}
-                    options={{ title: 'Lissafiy', headerStyle: {
-                     fontSize:25
-                   } }}
+                    options={
+                      { 
+                        title: 'Lissafiy',  
+                        headerStyle: {
+                        fontSize:25
+                        },
+                        headerRight:()=>(
+                          <Icon.Button 
+                            name="bars" 
+                            color="#575656"
+                            size={25}
+                            padding={10}
+                            backgroundColor="#fff"
+                            
+                            onPress={()=>setVisible(true) }
+                          >
+                          
+                        </Icon.Button>
+                        )
+                      }
+                      
+                  }
+                /> 
+                <Stack.Screen 
+                    name="CategoryAdd"
+                    component={CategoryAdd}
+                    options={
+                      { 
+                        title: 'Ajouter une catégorie'
+                      }
+                    }
+                />
+                <Stack.Screen 
+                    name="CategoryDetails"
+                    component={CategoryDetails}
+                    options={
+                      { 
+                        title: 'Détails catégories'
+                      }
+                    }
+                /> 
+                <Stack.Screen 
+                    name="About"
+                    component={About}
+                    options={
+                      { 
+                        title: 'A propos'
+                      }
+                    }
                 /> 
               </Stack.Navigator>
       </NavigationContainer>

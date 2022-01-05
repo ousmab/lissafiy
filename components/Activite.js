@@ -1,12 +1,12 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {Alert, Modal,StyleSheet,SectionList, TouchableOpacity, ScrollView,Dimensions, TextInput,Pressable, Text, View} from 'react-native';
-import { SpeedDial ,Input,Button ,Card} from 'react-native-elements';
+import { SpeedDial ,Input,Button  } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
 import { Icon } from 'react-native-elements';
 import ModalSelector from 'react-native-modal-selector'
-import TextField from 'rn-md-textinput';
-import { LogBox, ToastAndroid, Platform } from 'react-native';
+
+import { LogBox, ToastAndroid, Platform , Animated} from 'react-native';
 import moment from 'moment';
 
 import {
@@ -20,7 +20,8 @@ import { getDatasets } from '../utils';
 
 function Activite({setOperation_dates}) {
 
-    
+ 
+
     const [modalVisible, setModalVisible] = useState(false)
     const [open, setOpen] = useState(false);
     const [bgColor, setBgColor] = useState("#f2f4f5")
@@ -43,7 +44,7 @@ function Activite({setOperation_dates}) {
       const [displayingDataChart, setDisplayingDataChart] = useState()
       
       useEffect(() => {
-        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
+        //LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
         
         
         getAllLastNdaysOperations(7,(operations, days_arry)=>{
@@ -297,7 +298,7 @@ function Activite({setOperation_dates}) {
             
             
             <ModalSelector
-              useNativeDriver={true}
+              
              style={{marginTop:20, width:300}}
               data={category_to_select}
              
@@ -328,27 +329,29 @@ function Activite({setOperation_dates}) {
 
           <View style={{ justifyContent:'center', alignItems:'center', marginTop:20}} >
           <ScrollView style={{width : 300 }}>
-            <TextField 
-              useNativeDriver={true}
-              label={'Montant'} 
+             
+            <TextInput
+                highlightColor={'#00BCD4'}
+                style={styles.input}
+                onChangeText={setonChangeMontant}
+                value={onChangeMontant}
+                placeholder="Montant"
+                keyboardType="numeric"
+              />
+
+            <TextInput 
+              style={styles.input}
               highlightColor={'#00BCD4'}
-              keyboardType={'numeric'}
-              onChangeText={setonChangeMontant}
-              value={onChangeMontant}
-               /> 
-              
-            <TextField 
-              useNativeDriver={true}
-              label={'Nature'} 
+              placeholder={'Nature'} 
               highlightColor={'#00BCD4'}
               onChangeText={setonChangeNature}
               value={onChangeNature}
              /> 
             {
                tiers_operation != null && (
-                  <TextField 
-                  
-                  label={'Tiers'} 
+                  <TextInput 
+                  style={styles.input}
+                  placeholder={'Tiers'} 
                   highlightColor={'#00BCD4'}
                   onChangeText={setonChangeTiers}
                   value={onChangeTiers}
@@ -441,10 +444,11 @@ function Activite({setOperation_dates}) {
     
    
     </View>
-  
+
+           
     <SpeedDial
           title={""}
-          useNativeDriver={true}
+          transitionDuration={10}
           isOpen={open}
           icon={{ name: 'edit', color: '#fff' }}
           openIcon={{ name: 'close', color: '#fff' }}
@@ -488,6 +492,14 @@ function Activite({setOperation_dates}) {
   }
 
   const styles = StyleSheet.create({
+    input: {
+      height: 50,
+      marginBottom:20,
+      borderRadius:5,
+      borderWidth: 1,
+      padding: 10,
+      borderColor:"#696969"
+    },
     centeredView: {
       flex: 1,
       justifyContent: "center",

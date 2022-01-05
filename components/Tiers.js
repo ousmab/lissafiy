@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text,View,Dimensions, StyleSheet, SectionList, StatusBar, TouchableOpacity} from 'react-native';
-import TabSelectorAnimation from 'react-native-tab-selector'
+//import TabSelectorAnimation from 'react-native-tab-selector'
 import {getAllOperationsTiers } from "../databases/operationModel"
 import { getSectionListDataStructure } from '../utils';
 import EmptySectionList from './EmptySectionList';
@@ -22,26 +22,20 @@ import EmptySectionList from './EmptySectionList';
 function Tiers({type_tiers}) {
 
   const [data, setData] = useState()
-  
-  
-
-
   useEffect(() => {
+
+    console.log("tiers entrer")
+
     if(type_tiers){
-
-
       getAllOperationsTiers((operations)=>{
-  
         let structured_data = getSectionListDataStructure('type_debt',type_tiers,operations)
         setData(structured_data)
       })
   
     }else{ 
-  
       // aficher une chargeur loading...
     }
     return () => {
-      
     }
   }, [])
 
@@ -73,10 +67,7 @@ function Tiers({type_tiers}) {
               style={styles.tabSelector}
               tabs={DATA_TAB}
           />
-         
-
           <Text style={styles.text}>{`Current tab is ${indexTab + 1}`}</Text>*/}
-
 
         </View>
         <SectionList
@@ -105,6 +96,8 @@ function Tiers({type_tiers}) {
     </SafeAreaView>
   );
 }
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
