@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     width : Dimensions.get('window').width-5
   },
     header: {
-      fontSize: 25,
+      fontSize: 20,
       height:50,
       paddingVertical:10,
       color:"#a2a5a6",

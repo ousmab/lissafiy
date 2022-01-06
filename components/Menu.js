@@ -5,7 +5,7 @@ import { Button, Overlay,Icon, TouchableOpacity   } from 'react-native-elements'
 import { useNavigation } from '@react-navigation/native';
 
 
-export default function Menu({toggle,visible}) {
+export default function Menu({toggle,visible,setModalVisible}) {
 
     const navigation = useNavigation();
 
@@ -20,12 +20,12 @@ export default function Menu({toggle,visible}) {
         >
                 <Button
                     onPress={()=>{
-                        navigation.navigate('CategoryAdd')
+                        setModalVisible(true)
                         toggle(false)
                     } }
                     containerStyle={{
                         width: 200,
-                        marginHorizontal: 40,
+                        marginHorizontal: 35,
                         marginVertical: 10,
                     }}
                     title="Créer une catégorie"
@@ -49,6 +49,23 @@ export default function Menu({toggle,visible}) {
                     titleStyle={{ color: '#5a5d63' }}
                     
                     icon={<Icon name="list" size={30} />}
+                />
+
+                <Button
+                    onPress={()=>{
+                        alert("dois convertir la bd en excel")
+                        toggle(false)
+                    } }
+                    containerStyle={{
+                        width: 200,
+                        marginHorizontal: 45,
+                        marginVertical: 10,
+                    }}
+                    title="Exporter Les données"
+                    type="clear"
+                    titleStyle={{ color: '#5a5d63' }}
+                    
+                    icon={<Icon name="save" size={30} />}
                 />
 
                 <Button

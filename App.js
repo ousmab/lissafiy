@@ -6,10 +6,10 @@ import { View , Text } from 'react-native';
 
 import HomeScreen from './components/HomeScreen';
 import Menu from './components/Menu';
-import CategoryAdd from "./components/CategoryAdd"
+
 import CategoryDetails from "./components/CategoryDetails"
 import About from "./components/About"
-
+import FormCategory from "./components/FormCategory"
 
 import { createCategorieTable } from './databases/categoryModel';
 import { createOperationTable} from './databases/operationModel';
@@ -17,14 +17,7 @@ import { createOperationTable} from './databases/operationModel';
 import Icon from "react-native-vector-icons/FontAwesome"
 const Stack = createNativeStackNavigator();
 
-const Home=()=>{
 
-  return (
-    <View>
-      <Text>Autres</Text>
-    </View>
-  )
-}
 
 export default function App({ navigation }) {
 
@@ -34,13 +27,15 @@ export default function App({ navigation }) {
     setVisible(!visible);
   };
 
+  const [modalVisible, setModalVisible] = useState(false)
+
   useEffect(() => {
-   
+    
     createCategorieTable()
     createOperationTable()
    
     return () => {
-
+      
     }
   }, [])
 
@@ -49,7 +44,8 @@ export default function App({ navigation }) {
     <SafeAreaProvider>
         
         <NavigationContainer >
-              <Menu toggle={toggleOverlay}  visible={visible} />
+              <Menu toggle={toggleOverlay}  visible={visible} setModalVisible={setModalVisible} />
+              <FormCategory setModalVisible={setModalVisible} modalVisible={modalVisible}/>
               <Stack.Navigator screenOptions={{headerShadowVisible: false}}>
                 <Stack.Screen 
                     name="Home"
@@ -77,15 +73,7 @@ export default function App({ navigation }) {
                       
                   }
                 /> 
-                <Stack.Screen 
-                    name="CategoryAdd"
-                    component={CategoryAdd}
-                    options={
-                      { 
-                        title: 'Ajouter une catégorie'
-                      }
-                    }
-                />
+                
                 <Stack.Screen 
                     name="CategoryDetails"
                     component={CategoryDetails}

@@ -10,7 +10,7 @@ export default function EmptySectionList() {
 
 const styles = StyleSheet.create({
     emptyText:{
-        fontSize : 25,
+        fontSize : 17,
         color : "#5e5e5e",
         marginTop:50
     }

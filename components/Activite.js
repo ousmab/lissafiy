@@ -1,20 +1,21 @@
 import React, {useState, useEffect, useRef} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {Alert, Modal,StyleSheet,SectionList, TouchableOpacity, ScrollView,Dimensions, TextInput,Pressable, Text, View} from 'react-native';
-import { SpeedDial ,Input,Button  } from 'react-native-elements';
+import { SpeedDial ,Input,Button , ListItem,  Avatar } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
 import { Icon } from 'react-native-elements';
 import ModalSelector from 'react-native-modal-selector'
 
-import { LogBox, ToastAndroid, Platform , Animated} from 'react-native';
+import { LogBox, ToastAndroid, Platform } from 'react-native';
 import moment from 'moment';
 
 import {
   LineChart
 } from "react-native-chart-kit";
 import { CATEGORY_OUT, CATEGORY_IN, getAllCategoryByType, CATEGORY_DETTE } from '../databases/categoryModel';
-import {getAllDays, insertOperation , getAllLastNdaysOperations, getSumInOrOout, getSumTypeDebt } from '../databases/operationModel'
+import {getAllDays, insertOperation , getAllLastNdaysOperations, getSumInOrOout, getTiersBalance } from '../databases/operationModel'
 import { getDatasets } from '../utils';
+
 
 
 
@@ -26,7 +27,10 @@ function Activite({setOperation_dates}) {
     const [open, setOpen] = useState(false);
     const [bgColor, setBgColor] = useState("#f2f4f5")
     const [btnDisabled, setBtnDisabled] = useState(true)
-  
+    const [recetteExpanded, setRecetteExpanded] = useState(false)
+    const [depenseExpand, setDepenseExpandExpanded] = useState(false)
+    const [tiersExpand, setTiersExpand] = useState(false)
+    
     // les champs à enregistrer en BD
       // 1 TYPE D'OPERATION 
       // 1 DATE
@@ -43,23 +47,62 @@ function Activite({setOperation_dates}) {
       const [onChangeTiers, setonChangeTiers] = useState()
       const [displayingDataChart, setDisplayingDataChart] = useState()
       
+      const [recetteJour, setRecetteJour] = useState(0)
+      const [recetteSemaine, setRecetteSemaine] = useState(0)
+      const [recetteMois, setRecetteMois] = useState(0)
+      const [recetteTout, setRecetteTout] = useState(0)
+
+
+
+      const [depenseJour, setDepenseJour] = useState(0)
+      const [depenseSemaine, setDepenseSemaine] = useState(0)
+      const [depenseMois, setDepenseMois] = useState(0)
+      const [depenseTout, setDepenseTout] = useState(0)
+      const [soldeDette, setSoldeDette] = useState()
+      const [soldePret, setSoldePret] = useState()
+     
+
       useEffect(() => {
         //LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
         
+        getTiersBalance(CATEGORY_OUT, (result)=>{
+          console.log("betes ", result)
+        })
         
         getAllLastNdaysOperations(7,(operations, days_arry)=>{
             setDisplayingDataChart(getDatasets(operations, days_arry.reverse()))
         })
 
        // criteria = 'day' , 'week' ,'month' ,'all'
-       getSumInOrOout(CATEGORY_OUT,"all", (somme)=>{
-          console.log("charges et rectt ",somme)
-       })
+        getSumInOrOout(CATEGORY_IN,"day", (somme)=>{
+            setRecetteJour(somme)  
+        })
+        getSumInOrOout(CATEGORY_IN,"week", (somme)=>{
+          setRecetteSemaine(somme)  
+        })
+        getSumInOrOout(CATEGORY_IN,"month", (somme)=>{
+          setRecetteMois(somme)  
+        })
+        getSumInOrOout(CATEGORY_IN,"all", (somme)=>{
+          setRecetteTout(somme)  
+        })
 
-
-       getSumTypeDebt(CATEGORY_DETTE,0,(result)=>{
-         console.log("type dettes" ,result)
-       })
+        //
+      getSumInOrOout(CATEGORY_OUT,"day", (somme)=>{
+          setDepenseJour(somme)  
+      })
+      getSumInOrOout(CATEGORY_OUT,"week", (somme)=>{
+        setDepenseSemaine(somme)  
+      })
+      getSumInOrOout(CATEGORY_OUT,"month", (somme)=>{
+        setDepenseMois(somme)  
+      })
+      getSumInOrOout(CATEGORY_OUT,"all", (somme)=>{
+        setDepenseTout(somme)  
+      })
+       
+      
+     
 
         console.log("montant : ",onChangeMontant,"nature : ",onChangeNature,"tiers : ",onChangeTiers, "oT>",tiers_operation)
         
@@ -91,32 +134,6 @@ function Activite({setOperation_dates}) {
           operation_type ,
           //displayingDataChart
         ])
-
-    const DATA = [
-      {
-        title: " détails recettes",
-        data: ["jour", "semaine", "mois","toutes"]
-      }
-    ];
-    
-    const DATA2 = [
-      {
-        title: " détails des dettes",
-        data: ["jour", "semaine", "mois","toutes"]
-      }
-    ];
-    const DATA3 = [
-      {
-        title: " détails des dépenses",
-        data: ["jour", "semaine", "mois","toutes"]
-      }
-    ];
-
-    const DATA4 = [
-      {
-        title: " détails des prêts",
-        data: ["jour", "semaine", "mois","tous"]
-      }]
 
     const Item = ({ title }) => (
       <View style={styles.item}>
@@ -196,57 +213,137 @@ function Activite({setOperation_dates}) {
               }}
               />
             }
-        <View style={{ backgroundColor:"#fff", marginRight:10, marginLeft:10 }}>
-          <SectionList
-            style={{ marginTop:20}}
-            sections={DATA}
-            keyExtractor={(item, index) => item + index}
-            renderItem={({ item }) => <Item title={item} />}
-            renderSectionHeader={({ section: { title } }) => (
-              <Text style={styles.header}>{title}</Text>
-            )}
-          />
-          
+     
+     <Text style={{ fontSize:25, color :"#a2a5a6", margin :10 }}>Résumé Financière</Text>
+        <View style={{ backgroundColor:"#fff", marginRight:10, marginLeft:10, marginTop :10 }}>
+              
+              <ListItem.Accordion
+                content={
+                  <>
+                    <Icon name="arrow-back" size={30}  />
+                    <ListItem.Content>
+                      <ListItem.Title>Détails Dépenses</ListItem.Title>
+                    </ListItem.Content>
+                  </>
+                }
+                isExpanded={depenseExpand}
+                onPress={() => {
+                  setDepenseExpandExpanded(!depenseExpand);
+                }}
+              >
+                {
+                  <>
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                    <ListItem.Content>
+                        <ListItem.Title>{"Aujourd'hui"}</ListItem.Title>
+                        <ListItem.Subtitle>{ depenseJour }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                        <ListItem.Title>{"semaine en cours"}</ListItem.Title>
+                        <ListItem.Subtitle>{ depenseSemaine }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                        <ListItem.Title>{"Mois en cours"}</ListItem.Title>
+                        <ListItem.Subtitle>{ depenseMois }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                        <ListItem.Title>{"Toutes"}</ListItem.Title>
+                        <ListItem.Subtitle>{ depenseTout }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+                  </>
+                }
+              </ListItem.Accordion>
+
+              <ListItem.Accordion
+                content={
+                  <>
+                    <Icon name="note-add" size={30}   />
+                    <ListItem.Content>
+                      <ListItem.Title>Détails recettes</ListItem.Title>
+                    </ListItem.Content>
+                  </>
+                }
+                isExpanded={recetteExpanded}
+                onPress={() => {
+                  setRecetteExpanded(!recetteExpanded);
+                }}
+              >
+                {
+                  <>
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                    <ListItem.Content>
+                        <ListItem.Title>{"Aujourd'hui"}</ListItem.Title>
+                        <ListItem.Subtitle>{ recetteJour }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                        <ListItem.Title>{"semaine en cours"}</ListItem.Title>
+                        <ListItem.Subtitle>{ recetteSemaine }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                        <ListItem.Title>{"Mois en cours"}</ListItem.Title>
+                        <ListItem.Subtitle>{ recetteMois }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                        <ListItem.Title>{"Toutes"}</ListItem.Title>
+                        <ListItem.Subtitle>{ recetteTout }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+                  </>
+                }
+              </ListItem.Accordion>
+
+              <ListItem.Accordion
+                style={{marginTop:10}}
+                content={
+                  <>
+                    <Icon name="people-alt"  size={30} />
+                    <ListItem.Content>
+                      <ListItem.Title>Etats dettes / prêts</ListItem.Title>
+                    </ListItem.Content>
+                  </>
+                }
+                isExpanded={tiersExpand}
+                onPress={() => {
+                  setTiersExpand(!tiersExpand);
+                }}
+              >
+                {
+                  <>
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                    <ListItem.Content>
+                        <ListItem.Title>{"soldes dettes"}</ListItem.Title>
+                        <ListItem.Subtitle>{ soldeDette }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                        <ListItem.Title>{"solde prêts"}</ListItem.Title>
+                        <ListItem.Subtitle>{ soldePret }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+                   
+                   
+                  </>
+                }
+              </ListItem.Accordion>
         </View>
          
-        <View style={{ backgroundColor:"#fff"}}>
-          <SectionList
-              style={{ marginTop:20}}
-              sections={DATA2}
-              keyExtractor={(item, index) => item + index}
-              renderItem={({ item }) => <Item title={item} />}
-              renderSectionHeader={({ section: { title } }) => (
-                <Text style={styles.header}>{title}</Text>
-              )}
-            />
-        </View>
-
-        
-        <View style={{ backgroundColor:"#fff"}}>
-          <SectionList
-              style={{ marginTop:20}}
-              sections={DATA3}
-              keyExtractor={(item, index) => item + index}
-              renderItem={({ item }) => <Item title={item} />}
-              renderSectionHeader={({ section: { title } }) => (
-                <Text style={styles.header}>{title}</Text>
-              )}
-            />
-        </View>
-
-        
-        <View style={{ backgroundColor:"#fff" }}>
-          <SectionList
-              style={{ marginTop:20}}
-              sections={DATA4}
-              keyExtractor={(item, index) => item + index}
-              renderItem={({ item }) => <Item title={item} />}
-              renderSectionHeader={({ section: { title } }) => (
-                <Text style={styles.header}>{title}</Text>
-              )}
-            />
-        </View>
-       
     </ScrollView>
 
     
@@ -445,7 +542,7 @@ function Activite({setOperation_dates}) {
    
     </View>
 
-           
+    
     <SpeedDial
           title={""}
           transitionDuration={10}

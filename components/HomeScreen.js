@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import {View } from "react-native"
 import { getAllDays } from '../databases/operationModel';
 import Activite from "../components/Activite";
 import Tiers from "../components/Tiers";

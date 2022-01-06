@@ -70,8 +70,8 @@ function Historique({dates}) {
   const [indexTab, setIndexTab] = useState(0)
   const DATA_TAB = [{ title: 'Tous' }, { title: 'semaine' }, { title: 'mois' }]
  
-  const [check1, setCheck1] = useState(false);
-  const [check2, setCheck2] = useState(false);
+  //const [check1, setCheck1] = useState(false);
+  //const [check2, setCheck2] = useState(false);
  
 
 

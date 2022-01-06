@@ -1,5 +1,6 @@
 import { openDb } from "./dbConnexion"
 import moment from "moment"
+import { CATEGORY_IN } from "./categoryModel"
 
 
 
@@ -34,7 +35,51 @@ export  function createOperationTable(){
 }
 
 
+export function getTiersBalance(type,callback){
+    const db =  openDb()
+    
+    
 
+    let solde_type = type == CATEGORY_IN ? '(sum(operations.in_amount)-sum( operations.out_amount))':
+    '(sum(operations.out_amount)-sum( operations.in_amount))';
+
+  
+    
+    let requete = ` 
+        SELECT ${ solde_type } as solde      
+        FROM operations 
+        INNER JOIN 
+            category on operations.category_id=category.id
+        WHERE category.type_debt =? 
+         `
+
+    db.transaction(trs=>{ 
+        trs.executeSql(
+            requete
+            ,
+            [type],
+            (trs, results)=>{
+
+                if(results.rows.length>0){
+                  
+                    
+                    let solde = results.rows.item(0).solde
+                    callback(solde) 
+                    
+                }else{
+                    callback(0)
+                }
+
+                
+            },
+            (error)=>{
+                console.log("error solde tiers ", error)
+            }
+        )
+    })
+
+    
+}
 
 export function insertOperation(tabs, callback){
     // tabs = [date, category_id, label, in_amount, out_amount, person]
@@ -61,39 +106,39 @@ export function insertOperation(tabs, callback){
 export function getSumInOrOout(category_type,criteria,callback){
 
     //criteria = 'day' , 'week' ,'month' ,'all'
+    let colum_to_sum = category_type == CATEGORY_IN ? 'operations.in_amount' : 'operations.out_amount'
 
     let critere = ''
     switch (criteria) {
         case 'day':
-            critere = "WHERE operations.date = DATE('now','localtime') AND "
+            critere = " WHERE operations.date = DATE('now','localtime') AND "
             break;
         case 'week':
-            critere = "WHERE operations.date > (SELECT DATE('now','localtime', '-7 day')) AND "
+            critere = " WHERE strftime('%W',operations.date) =  strftime('%W',DATE('now','localtime')) AND "
             break;
         case 'month':
-            critere = "WHERE strftime('%m',operations.date) =  strftime('%m',DATE('now','localtime')) AND "
+            critere = " WHERE strftime('%m',operations.date) =  strftime('%m',DATE('now','localtime')) AND "
             break;
         case 'all':
-            critere = ' WHERE '
+            critere = " WHERE "
             break;
         default:
             break;
     }
 
     const db =  openDb()
-    
+    let requete = `
+    SELECT 	 
+    sum(${colum_to_sum}) as somme
+    FROM operations 
+    INNER JOIN 
+    category on operations.category_id=category.id ${critere} category.category_type=? and (category.type_debt is null or category.type_debt= '') 
+    `
+    console.log(requete)
 
     db.transaction(trs=>{ //{'id','label','categorie','montant'}
         trs.executeSql(
-            `
-            SELECT 	 
-		    sum(operations.out_amount) as somme
-            FROM operations 
-            INNER JOIN 
-            category on operations.category_id=category.id
-            ${critere} 
-             category.category_type=? and (category.type_debt is null or category.type_debt= "") 
-            `,
+            requete.toString(),
             [category_type],
             (trs, results)=>{
 
@@ -117,64 +162,7 @@ export function getSumInOrOout(category_type,criteria,callback){
     
 }
 
-export function getSumTypeDebt(category_type,criteria,callback){
 
-    //criteria = 'day' , 'week' ,'month' ,'all'
-
-    let critere = ''
-    switch (criteria) {
-        case 'day':
-            critere = "WHERE operations.date = DATE('now','localtime') AND "
-            break;
-        case 'week':
-            critere = "WHERE operations.date > (SELECT DATE('now','localtime', '-7 day')) AND "
-            break;
-        case 'month':
-            critere = "WHERE strftime('%m',operations.date) =  strftime('%m',DATE('now','localtime')) AND "
-            break;
-        case 'all':
-            critere = ' WHERE '
-            break;
-        default:
-            break;
-    }
-
-    const db =  openDb()
-    
-
-    db.transaction(trs=>{ //{'id','label','categorie','montant'}
-        trs.executeSql(
-            `
-            SELECT 	 
-		    sum(operations.out_amount) as somme
-            FROM operations 
-            INNER JOIN 
-            category on operations.category_id=category.id
-            ${critere} 
-             category.category_type=? and (category.type_debt is null or category.type_debt= "") 
-            `,
-            [category_type],
-            (trs, results)=>{
-
-                if(results.rows.length>0){
-                    
-                    let somme =  results.rows.item(0).somme ? results.rows.item(0).somme : 0
-                    callback(somme)
-                    
-                }else{
-                    callback(0)
-                }
-
-                
-            },
-            (error)=>{
-                console.log("error during selection ", error)
-            }
-        )
-    })
-
-    
-}
 
 
 
@@ -467,3 +455,5 @@ export function getAllOperations(callback){
 
     
 }
+
+

@@ -50,6 +50,7 @@ export function insertCategory(tabs, callback){
                 }
             },
             (error)=>{
+                callback(false)
               console.log(error)
             }
         )
