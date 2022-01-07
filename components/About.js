@@ -33,7 +33,7 @@ export default function About() {
                   
                   {`Author : Aboubakar Ousmanne\nmail      : aboousmane@gmail.com`}
                   </Text>
-
+                  <Text style={{ fontSize:12, textAlign:'center', color:"#3f5ad1" }}>version 1.0.0</Text>
                 <Text style={{fontWeight:'bold',fontStyle :'italic', fontSize:13, color:"#787878",width : Dimensions.get('window').width-50  }}>
                    </Text>
             </View>

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useLayoutEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text,View,Dimensions, StyleSheet, SectionList, StatusBar, TouchableOpacity} from 'react-native';
 //import TabSelectorAnimation from 'react-native-tab-selector'
-import {getAllOperationsTiers } from "../databases/operationModel"
+import {getAllOperationsTiers, getBalanceByTiers } from "../databases/operationModel"
 import { getSectionListDataStructure } from '../utils';
 import EmptySectionList from './EmptySectionList';
-
+import { CATEGORY_DETTE, CATEGORY_PRET } from '../databases/categoryModel';
+import { ListItem, Icon } from 'react-native-elements';
 /*const DATA = [
   {
     title: " Les dettes : 45000",
@@ -19,25 +20,34 @@ import EmptySectionList from './EmptySectionList';
 
 //const DATA_TAB = [{ title: 'Tous' }, { title: 'semaine' }, { title: 'mois' }]
 
-function Tiers({type_tiers}) {
+function Tiers({type_debt}) {
 
-  const [data, setData] = useState()
-  useEffect(() => {
+  const [dettesExpand, setDettesExpand] = useState(true)
+  const [pretsExpand, setPretsExpand] = useState(true)
 
-    console.log("tiers entrer")
+  const [dataDettes, setDataDettes] = useState([])
+  const [dataPrets, setDataPrets] = useState([])
 
-    if(type_tiers){
-      getAllOperationsTiers((operations)=>{
-        let structured_data = getSectionListDataStructure('type_debt',type_tiers,operations)
-        setData(structured_data)
-      })
-  
-    }else{ 
-      // aficher une chargeur loading...
-    }
+
+  useLayoutEffect(() => {
+
+   
+
+
+    getBalanceByTiers(CATEGORY_DETTE, (dettes)=>{
+      
+      setDataDettes(dettes)
+    })
+
+    getBalanceByTiers(CATEGORY_PRET, (prets)=>{
+      
+        setDataPrets(prets)
+    })
+   
+    
     return () => {
     }
-  }, [])
+  }, [type_debt,pretsExpand, dettesExpand])
 
   //const [indexTab, setIndexTab] = useState(0)
 
@@ -54,7 +64,7 @@ function Tiers({type_tiers}) {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <SafeAreaView style={{ flex: 1, marginTop :5 }}>
 
         <View style={styles.tab_container}>
 
@@ -70,29 +80,84 @@ function Tiers({type_tiers}) {
           <Text style={styles.text}>{`Current tab is ${indexTab + 1}`}</Text>*/}
 
         </View>
-        <SectionList
-          sections={data}
-          keyExtractor={item => item.id.toString() }
-          renderItem={
-            ({item})=>(
-              <View style={styles.item}>
-                <TouchableOpacity
-                  onPress={()=>alert('afficher un modal pour modifier la selection')}
-                >
-                    <Text style={styles.title}>{item.label}</Text>
-                </TouchableOpacity>
-                
-              </View>
-            )
-          }
-          renderSectionHeader={({section})=>{
-            return  <Text style={styles.header}>{section.title== 1 ? 'Emprunts' : 'Prêts' }</Text>
-          }}
-          ListEmptyComponent={<EmptySectionList />}
-          stickySectionHeadersEnabled
+        <ListItem.Accordion
+                content={
+                  <>
+                    {/**<Icon name="event" size={30}  /> */}
+                    <ListItem.Content>
+                      <ListItem.Title>Dettes</ListItem.Title>
+                    </ListItem.Content>
+                  </>
+                }
+                isExpanded={dettesExpand}
+                onPress={() => {
+                  getBalanceByTiers(CATEGORY_DETTE, (dettes)=>{
+      
+                    setDataDettes(dettes)
+                  })
+                  setDettesExpand(!dettesExpand);
+                }}
+              >
+                {
+                  <>
+                    
+                    {
+                    dataDettes.map(element=>(
+                      <ListItem key={element.tiers}  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                          <ListItem.Title>{element.tiers}</ListItem.Title>
+                          <ListItem.Subtitle>{ element.solde }</ListItem.Subtitle>
+                        </ListItem.Content>
+                      </ListItem>
+                    ))
+                   } 
 
-        />
+                    
+                   
+                  </>
+                }
+        </ListItem.Accordion>
+        
 
+
+        <ListItem.Accordion
+                content={
+                  <>
+                    {/**<Icon name="arrow-back" size={30}  /> */}
+                    <ListItem.Content>
+                      <ListItem.Title>Prêts</ListItem.Title>
+                    </ListItem.Content>
+                  </>
+                }
+                isExpanded={pretsExpand}
+                onPress={() => {
+
+                  
+                  getBalanceByTiers(CATEGORY_PRET, (prets)=>{
+      
+                    setDataPrets(prets)
+                  })
+               
+                  setPretsExpand(!pretsExpand);
+                }}
+              >
+                {
+                  <>
+                    {
+                      dataPrets.map(element=>(
+                        <ListItem key={element.tiers}  onPress={()=>("")} bottomDivider>
+                        <ListItem.Content>
+                            <ListItem.Title>{element.tiers}</ListItem.Title>
+                            <ListItem.Subtitle>{ element.solde }</ListItem.Subtitle>
+                          </ListItem.Content>
+                        </ListItem>
+                      ))
+                    }
+
+                   
+                  </>
+                }
+        </ListItem.Accordion>
     </SafeAreaView>
   );
 }
@@ -118,7 +183,7 @@ const styles = StyleSheet.create({
       backgroundColor: "#f2f4f5"
     },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     color: '#4e4f4f'
   },
   tab_container: {

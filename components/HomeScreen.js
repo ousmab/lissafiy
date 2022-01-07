@@ -1,9 +1,8 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
 import { getAllDays } from '../databases/operationModel';
 import Activite from "../components/Activite";
 import Tiers from "../components/Tiers";
@@ -20,15 +19,20 @@ export default function HomeScreen({ navigation }) {
 
     const [operation_dates, setOperation_dates] = useState()
     const [tiers_type, setTiers_type] = useState([1,2])
+    const [onHistorique, setOnHistorique] = useState(false)
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       
-      
+      console.log("homme screen updating with onhistorisu")
+      getAllDays((dates)=>{
+        setOperation_dates(dates)
+      })
 
+      setTiers_type([1,2])
       return () => { 
         
       }
-    }, [
+    }, [onHistorique
       //operation_dates ENGENDRE UNE MISE A JOUR
     ])
 
@@ -49,14 +53,12 @@ export default function HomeScreen({ navigation }) {
 
             switch (tab_index) {
               case 0:// si on est sur le tab Activité
-                  
+              setOnHistorique(false) 
                 break;
               
               case 1:// si on est sur le tab Historique
-                console.log(tab_index)
-                getAllDays((dates)=>{
-                  setOperation_dates(dates)
-                })
+                setOnHistorique(true)
+                
                 
                 
               break;
@@ -69,6 +71,7 @@ export default function HomeScreen({ navigation }) {
                   getAllTiersType((dates)=>{
                     setOperation_dates(dates)
                   })*/
+                  setOnHistorique(false) 
               break;
 
               default:

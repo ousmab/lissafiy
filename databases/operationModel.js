@@ -1,6 +1,6 @@
 import { openDb } from "./dbConnexion"
 import moment from "moment"
-import { CATEGORY_IN } from "./categoryModel"
+import { CATEGORY_DETTE, CATEGORY_IN, CATEGORY_PRET } from "./categoryModel"
 
 
 
@@ -32,6 +32,64 @@ export  function createOperationTable(){
         )
     })
    
+}
+
+export function getBalanceByTiers(type_debt,callback){
+    const db =  openDb()
+    
+    let resultat = []
+
+    let type_solde = type_debt == CATEGORY_PRET ? 'sum(out_amount)-sum(in_amount)':
+    'sum(in_amount)-sum(out_amount)';
+
+  
+    
+    let requete = ` 
+    select ${ type_solde } as balance , person from 
+    (   
+        select * from operations 
+        inner join category 
+        on operations.category_id = category.id 
+        where category.type_debt=?
+    ) 
+    group by person;
+     `
+
+    db.transaction(trs=>{ 
+        trs.executeSql(
+            requete
+            ,
+            [type_debt],
+            (trs, results)=>{
+
+                if(results.rows.length>0){
+                    
+
+                    for (let i =0; i < results.rows.length; i++ ){
+
+                        resultat.push(
+                            {
+                                'tiers':results.rows.item(i).person,
+                                'solde':results.rows.item(i).balance
+                            }
+                        )
+                    }
+
+                    callback(resultat)
+                    
+                }else{
+                    callback([])
+                }
+
+                
+            },
+            (error)=>{
+                console.log("error solde par tiers ", error)
+            }
+        )
+    })
+
+    
 }
 
 
@@ -352,7 +410,7 @@ export function getAllOperationsTiers(callback){
             INNER JOIN 
                 category on operations.category_id=category.id
             WHERE category.type_debt =1 or category.type_debt =2
-            ORDER BY operations.date DESC;
+            ORDER BY operations.date DESC,operations.id DESC ;
             `,
             [],
             (trs, results)=>{
@@ -414,7 +472,7 @@ export function getAllOperations(callback){
             FROM operations 
             INNER JOIN 
                 category on operations.category_id=category.id
-            ORDER BY operations.date DESC;
+            ORDER BY operations.date DESC, operations.id DESC;
             `,
             [],
             (trs, results)=>{
@@ -455,5 +513,7 @@ export function getAllOperations(callback){
 
     
 }
+
+
 
 

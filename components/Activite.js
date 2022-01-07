@@ -1,19 +1,19 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {Alert, Modal,StyleSheet,SectionList, TouchableOpacity, ScrollView,Dimensions, TextInput,Pressable, Text, View} from 'react-native';
-import { SpeedDial ,Input,Button , ListItem,  Avatar } from 'react-native-elements';
+import {Alert, Modal,StyleSheet, TouchableOpacity, ScrollView,Dimensions, TextInput, Text, View} from 'react-native';
+import { SpeedDial ,Button , ListItem } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
 import { Icon } from 'react-native-elements';
 import ModalSelector from 'react-native-modal-selector'
 
-import { LogBox, ToastAndroid, Platform } from 'react-native';
+import { ToastAndroid, Platform } from 'react-native';
 import moment from 'moment';
 
 import {
   LineChart
 } from "react-native-chart-kit";
-import { CATEGORY_OUT, CATEGORY_IN, getAllCategoryByType, CATEGORY_DETTE } from '../databases/categoryModel';
-import {getAllDays, insertOperation , getAllLastNdaysOperations, getSumInOrOout, getTiersBalance } from '../databases/operationModel'
+import { CATEGORY_OUT, CATEGORY_IN, getAllCategoryByType  } from '../databases/categoryModel';
+import {insertOperation , getAllLastNdaysOperations, getSumInOrOout, getTiersBalance } from '../databases/operationModel'
 import { getDatasets } from '../utils';
 
 
@@ -22,9 +22,9 @@ import { getDatasets } from '../utils';
 function Activite({setOperation_dates}) {
 
  
-
+  
     const [modalVisible, setModalVisible] = useState(false)
-    const [open, setOpen] = useState(false);
+    const [openSpeed, setOpenSpeed] = useState(false);
     const [bgColor, setBgColor] = useState("#f2f4f5")
     const [btnDisabled, setBtnDisabled] = useState(true)
     const [recetteExpanded, setRecetteExpanded] = useState(false)
@@ -64,9 +64,16 @@ function Activite({setOperation_dates}) {
 
       useEffect(() => {
         //LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
-        
+      
+
         getTiersBalance(CATEGORY_OUT, (result)=>{
-          console.log("betes ", result)
+          setSoldePret(result)
+          console.log("prets ", result)
+        })
+
+        getTiersBalance(CATEGORY_IN, (result)=>{
+          setSoldeDette(result)
+          console.log("dettes ", result)
         })
         
         getAllLastNdaysOperations(7,(operations, days_arry)=>{
@@ -131,7 +138,7 @@ function Activite({setOperation_dates}) {
           onChangeTiers,
           category_selected,
           tiers_operation,
-          operation_type ,
+          operation_type 
           //displayingDataChart
         ])
 
@@ -343,7 +350,53 @@ function Activite({setOperation_dates}) {
                 }
               </ListItem.Accordion>
         </View>
-         
+        {/*<Text style={{ fontSize:25, color :"#a2a5a6", margin :10 }}>Etat par catégorie</Text> 
+              
+              <ListItem.Accordion
+                content={
+                  <>
+                    <Icon name="arrow-back" size={30}  />
+                    <ListItem.Content>
+                      <ListItem.Title>Détails catégories</ListItem.Title>
+                    </ListItem.Content>
+                  </>
+                }
+                isExpanded={depenseExpand}
+                onPress={() => {
+                  setDepenseExpandExpanded(!depenseExpand);
+                }}
+              >
+                {
+                  <>
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                    <ListItem.Content>
+                        <ListItem.Title>{"Aujourd'hui"}</ListItem.Title>
+                        <ListItem.Subtitle>{ depenseJour }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                        <ListItem.Title>{"semaine en cours"}</ListItem.Title>
+                        <ListItem.Subtitle>{ depenseSemaine }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                        <ListItem.Title>{"Mois en cours"}</ListItem.Title>
+                        <ListItem.Subtitle>{ depenseMois }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+                    <ListItem  onPress={()=>("")} bottomDivider>
+                      <ListItem.Content>
+                        <ListItem.Title>{"Toutes"}</ListItem.Title>
+                        <ListItem.Subtitle>{ depenseTout }</ListItem.Subtitle>
+                      </ListItem.Content>
+                    </ListItem>
+                  </>
+                }
+              </ListItem.Accordion>*/}
+
     </ScrollView>
 
     
@@ -506,6 +559,9 @@ function Activite({setOperation_dates}) {
                       setonChangeNature("")
                       setonChangeTiers("")
 
+                      // mise a jour de l'historique et des tiers
+                    
+
                   }else{
                    Alert.alert("Echec","echec d'enregistrement !")
                   }
@@ -516,6 +572,7 @@ function Activite({setOperation_dates}) {
 
               <Button
                   onPress={()=>{
+                    setDate(new Date())
                     setModalVisible(!modalVisible)
                     setonChangeMontant("")
                     setonChangeNature("")
@@ -546,11 +603,11 @@ function Activite({setOperation_dates}) {
     <SpeedDial
           title={""}
           transitionDuration={10}
-          isOpen={open}
+          isOpen={openSpeed}
           icon={{ name: 'edit', color: '#fff' }}
           openIcon={{ name: 'close', color: '#fff' }}
-          onOpen={() => setOpen(!open)}
-          onClose={() => setOpen(!open)}
+          onOpen={() => setOpenSpeed(!openSpeed)}
+          onClose={() => setOpenSpeed(!openSpeed)}
           color='black'
         >
           <SpeedDial.Action
@@ -558,6 +615,7 @@ function Activite({setOperation_dates}) {
             icon={{ name: 'remove', color: '#fff' }}
             title="saisir les sorties"
             onPress={() => {
+                setOpenSpeed(false)
                 setCategory_selected(null)
                 setTiers_operation(null)
                 setModalVisible(true)
@@ -568,10 +626,11 @@ function Activite({setOperation_dates}) {
             color='#b80730'
           />
           <SpeedDial.Action
-          useNativeDriver={true}
+            
             icon={{ name: 'add', color: '#fff' }}
             title="saisir les entrées"
             onPress={() => {
+              setOpenSpeed(false)
               setCategory_selected(null)
               setTiers_operation(null)
               setModalVisible(true)

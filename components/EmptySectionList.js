@@ -4,7 +4,7 @@ import {Text, StyleSheet } from 'react-native';
 
 export default function EmptySectionList() {
     return (
-        <Text style={styles.emptyText}>Aucun element !</Text>
+        <Text style={styles.emptyText}>Chargement des données ... </Text>
     )
 }
 

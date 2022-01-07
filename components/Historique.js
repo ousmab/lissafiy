@@ -4,23 +4,25 @@ import { Text, View, FlatList,SectionList,TouchableOpacity ,StyleSheet, StatusBa
 import TabSelectorAnimation from 'react-native-tab-selector'
 import { CheckBox} from 'react-native-elements';
 import { getAllOperations, getAllDays,getAllOperationsByDate } from '../databases/operationModel'
-import { insertCategory, CATEGORY_IN, CATEGORY_OUT, CATEGORY_PRET, CATEGORY_DETTE } from '../databases/categoryModel';
 import { getSectionListDataStructure } from '../utils';
 
 
 import EmptySectionList from './EmptySectionList';
+import { CATEGORY_IN } from '../databases/categoryModel';
 
 
 function Historique({dates}) {
  
 
   const [data, setData] = useState([])
-  const [dates_operations, setDates_operations] = useState([])
+  
 
   
 
   useEffect(() => {
 
+
+    
     /*insertCategory(["Emprunts", CATEGORY_IN, CATEGORY_DETTE],(result)=>{
 
         console.log("categorie",result)
@@ -34,7 +36,7 @@ function Historique({dates}) {
       console.log("historique,", operations)
     })*/
 
-    setDates_operations(dates)
+    
 
     if(dates){
 
@@ -65,10 +67,10 @@ function Historique({dates}) {
     return () => {
       
     }
-  }, [])
+  }, [dates])
 
-  const [indexTab, setIndexTab] = useState(0)
-  const DATA_TAB = [{ title: 'Tous' }, { title: 'semaine' }, { title: 'mois' }]
+  //const [indexTab, setIndexTab] = useState(0)
+  //const DATA_TAB = [{ title: 'Tous' }, { title: 'semaine' }, { title: 'mois' }]
  
   //const [check1, setCheck1] = useState(false);
   //const [check2, setCheck2] = useState(false);
@@ -126,9 +128,11 @@ function Historique({dates}) {
             ({item})=>(
               <View style={styles.item}>
                 <TouchableOpacity
-                  onPress={()=>alert('afficher un modal pour modifier la selection')}
+                  onPress={()=>('afficher un modal pour modifier la selection')}
                 >
-                    <Text style={styles.title}>{item.label}</Text>
+                    <Text style={ styles.title }>{item.label}</Text>
+                    <Text style={styles.amount,{color:item.category_type== CATEGORY_IN ? '#10c25d' :'#c21810'} }>{item.category_type == CATEGORY_IN ? item.in_amount : item.out_amount }</Text>
+                    <Text style={ {alignSelf:"flex-end", color:"#ccc"} }>{item.categorie}</Text>
                 </TouchableOpacity>
                 
               </View>
@@ -151,6 +155,13 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: StatusBar.currentHeight || 0,
   },
+  amount:{
+    fontSize:15,
+    fontWeight:"bold",
+    
+    marginTop:5,
+    alignSelf:'flex-end'
+  },
   item: {
     
     borderBottomColor:"#ccc",
@@ -162,7 +173,7 @@ const styles = StyleSheet.create({
     width : Dimensions.get('window').width-5
   },
     header: {
-      fontSize: 25,
+      fontSize: 18,
       height:50,
       paddingVertical:10,
       color:"#a2a5a6",

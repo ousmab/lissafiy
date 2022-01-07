@@ -1,11 +1,11 @@
 
 import React,{useState} from 'react'
-import {Dimensions, StyleSheet, Text , View} from "react-native"
-import { Button, Overlay,Icon, TouchableOpacity   } from 'react-native-elements';
+import {Dimensions, StyleSheet} from "react-native"
+import { Button, Overlay,Icon   } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 
 
-export default function Menu({toggle,visible,setModalVisible}) {
+export default function Menu({toggle,visible,setModalVisible,permissionFs}) {
 
     const navigation = useNavigation();
 
@@ -34,7 +34,7 @@ export default function Menu({toggle,visible,setModalVisible}) {
                     icon={<Icon name="add" size={30} />}
                 />
 
-                <Button
+                {/*<Button
                     onPress={()=>{
                         navigation.navigate('CategoryDetails')
                         toggle(false)
@@ -49,11 +49,11 @@ export default function Menu({toggle,visible,setModalVisible}) {
                     titleStyle={{ color: '#5a5d63' }}
                     
                     icon={<Icon name="list" size={30} />}
-                />
+                />*/}
 
                 <Button
                     onPress={()=>{
-                        alert("dois convertir la bd en excel")
+                        permissionFs();
                         toggle(false)
                     } }
                     containerStyle={{
@@ -83,7 +83,7 @@ export default function Menu({toggle,visible,setModalVisible}) {
                     titleStyle={{ color: '#5a5d63', fontSize:12 }}
 
                 />
-        
+                
         </Overlay>
     )
 }

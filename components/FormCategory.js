@@ -109,7 +109,7 @@ export default function FormCategory({setModalVisible, modalVisible}) {
                 <View style={{   }}>
                     <CheckBox
                     
-                    title="emprunts"
+                    title="dettes"
                     checked={checkDebt}
                     onPress={() => {
                       setCheckDebt(!checkDebt)
