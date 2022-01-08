@@ -468,7 +468,8 @@ export function getAllOperations(callback){
                     operations.out_amount, 
                     category.category_type,
                     operations.person,
-                    category.type_debt  
+                    category.type_debt,
+                    category.id as category_id
             FROM operations 
             INNER JOIN 
                 category on operations.category_id=category.id
@@ -491,7 +492,8 @@ export function getAllOperations(callback){
                             'out_amount':results.rows.item(i).out_amount,
                             'category_type':results.rows.item(i).category_type,
                             'tiers':results.rows.item(i).person,
-                            'type_debt':results.rows.item(i).type_debt
+                            'type_debt':results.rows.item(i).type_debt,
+                            'category_id':results.rows.item(i).category_id,
                             }
                         )
 

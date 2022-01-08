@@ -61,7 +61,10 @@ function Activite({setOperation_dates}) {
       const [soldeDette, setSoldeDette] = useState()
       const [soldePret, setSoldePret] = useState()
      
-
+      const init_values_graph = {
+        'label':['0j','1j','2j','3j','4j','5j','6j'].reverse(),
+        'data':[0,0,0,0,0,0,0]
+      }
       useEffect(() => {
         //LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
       
@@ -170,19 +173,19 @@ function Activite({setOperation_dates}) {
     <ScrollView > 
         <Text style={{ fontSize:25, color :"#a2a5a6", margin :10 }}>Evolution des flux</Text>
       
-            {
-              
-            displayingDataChart &&  <LineChart
+            
+             
+           <LineChart
               data={{
-                labels:displayingDataChart['dates'].map(date=>moment(date).format('ddd')) ,
+                labels:displayingDataChart ? displayingDataChart['dates'].map(date=>moment(date).format('ddd')) : init_values_graph['label'] ,
                 legend: ["sorties","entrées"] ,// optional, 
                 datasets: [
                   {
-                    data: displayingDataChart['out'] ,
+                    data: displayingDataChart ? displayingDataChart['out']: init_values_graph['data'] ,
                     color: (opacity = 1) => `rgba(184, 7, 48)`
                   },
                   {
-                    data:displayingDataChart['in'] ,
+                    data:displayingDataChart ? displayingDataChart['in']: init_values_graph['data'] ,
                     color: (opacity = 1) => `rgba(7, 184, 48)`
                   }
                 ]
@@ -218,8 +221,8 @@ function Activite({setOperation_dates}) {
                 
                 
               }}
-              />
-            }
+            />
+            
      
      <Text style={{ fontSize:25, color :"#a2a5a6", margin :10 }}>Résumé Financière</Text>
         <View style={{ backgroundColor:"#fff", marginRight:10, marginLeft:10, marginTop :10 }}>

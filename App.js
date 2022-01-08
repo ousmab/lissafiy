@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Alert, PermissionsAndroid, Share } from 'react-native';
 import * as FileSystem from 'expo-file-system';
+import * as IntentLauncher from 'expo-intent-launcher';
 import XLSX from 'xlsx';
 
 
@@ -19,11 +20,34 @@ import { createOperationTable} from './databases/operationModel';
 
 import Icon from "react-native-vector-icons/FontAwesome"
 
+import { getAllCategory } from './databases/categoryModel';
+import { getAllOperations } from './databases/operationModel';
+
 const Stack = createNativeStackNavigator();
 
 
 
 export default function App({ navigation }) {
+
+
+  const [category_saved, setCategory_saved] = useState([])
+  const [operation_saved, setOperation_saved] = useState([])
+
+
+
+  const loading_data_to_save =()=>{
+    
+    getAllCategory((data)=>{
+      setCategory_saved(data)
+    })
+
+    getAllOperations((data)=>{
+      setOperation_saved(data)
+    })
+    setDataReadyToSave(true)
+  }
+  
+
 
   const onShare = async (url) => {
    
@@ -51,6 +75,7 @@ export default function App({ navigation }) {
   };
 
   const requestFileSystem = async () => {
+
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -64,33 +89,49 @@ export default function App({ navigation }) {
           buttonPositive: "Accepter"
         }
       );
+      // qu'on accepte ou pas on charge quand meme
+      
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-
+        
+        
         let file_name = 'Lissafiy_saved.xlsx'
-        var data = [{
-          "name": "John",
-          "city": "Seattle"
-        },
-        {
-          "name": "Mike",
-          "city": "Los Angeles"
-        },
-        {
-          "name": "Zach",
-          "city": "New York"
-        }
-      ];
-      var ws = XLSX.utils.json_to_sheet(data);
+
+      //var ws = XLSX.utils.json_to_sheet(data);
+      var categorie_ws =  XLSX.utils.json_to_sheet(category_saved);
+      var operations_ws =  XLSX.utils.json_to_sheet(operation_saved);
+
       var wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Cities");
+      XLSX.utils.book_append_sheet(wb, categorie_ws, "categories");
+      XLSX.utils.book_append_sheet(wb, operations_ws, "operations");
+
+
+
       const wbout = XLSX.write(wb, {
         type: 'base64',
         bookType: "xlsx"
       });
       const uri = FileSystem.cacheDirectory + file_name;
       //console.log(`Writing to ${JSON.stringify(uri)} with text: ${wbout}`);
+      FileSystem.writeAsStringAsync(uri, wbout, {
+        encoding: FileSystem.EncodingType.Base64
+      });
+      
+     
+      try {
 
-      await onShare(uri)
+        const cUri = await FileSystem.getContentUriAsync(uri);
+          
+        await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
+            data: cUri,
+            flags: 1,
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+      }catch(e){
+          console.log(e.message);
+      }
+
+
+      
 
      
      /* try {
@@ -108,6 +149,7 @@ export default function App({ navigation }) {
 
 
       } else {
+        
         Alert.alert("echec sauvegarde",
         'la sauvegarde n\'a pas pu s\'effectuer veuiller authoriser la permission')
       }
@@ -139,7 +181,7 @@ export default function App({ navigation }) {
     <SafeAreaProvider>
         
         <NavigationContainer >
-              <Menu permissionFs={requestFileSystem} toggle={toggleOverlay}  visible={visible} setModalVisible={setModalVisible} />
+              <Menu loadData={loading_data_to_save} permissionFs={requestFileSystem} toggle={toggleOverlay}  visible={visible} setModalVisible={setModalVisible} />
               <FormCategory setModalVisible={setModalVisible} modalVisible={modalVisible}/>
               <Stack.Navigator screenOptions={{headerShadowVisible: false}}>
                 <Stack.Screen 

@@ -36,7 +36,7 @@ function Historique({dates}) {
       console.log("historique,", operations)
     })*/
 
-    
+  console.log("sss ",data)    
 
     if(dates){
 
@@ -139,8 +139,14 @@ function Historique({dates}) {
             )
           }
           renderSectionHeader={({section})=>{
-            return  <Text style={styles.header}>{section.title}</Text>
-          }}
+            return   (
+              <Text style={styles.header}>{section.title} (
+                <Text style={{ fontSize:15, color :"red", alignSelf:"flex-end" }} >  5000</Text> 
+                <Text style={{ fontSize:15, color :"green", alignSelf:"flex-end" }} > --   5000</Text> )
+              </Text>
+  
+            )
+            }}
           ListEmptyComponent={<EmptySectionList />}
           stickySectionHeadersEnabled
 

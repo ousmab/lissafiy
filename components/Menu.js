@@ -5,7 +5,7 @@ import { Button, Overlay,Icon   } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 
 
-export default function Menu({toggle,visible,setModalVisible,permissionFs}) {
+export default function Menu({toggle,visible,setModalVisible,permissionFs, loadData}) {
 
     const navigation = useNavigation();
 
@@ -53,8 +53,11 @@ export default function Menu({toggle,visible,setModalVisible,permissionFs}) {
 
                 <Button
                     onPress={()=>{
+                        
+                        loadData()
                         permissionFs();
                         toggle(false)
+                        
                     } }
                     containerStyle={{
                         width: 200,
