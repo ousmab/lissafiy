@@ -1,3 +1,29 @@
+export function sumOperationsJour(date,datas){
+   let entree = 0
+   let sortie = 0
+ 
+    let result = datas.filter(element=>{
+     return element.title === date
+   })
+ 
+   let operations = result[0].data
+    
+      let tab_in = []
+     let tab_out = []
+    for (let i=0 ; i < operations.length ; i++){
+        tab_in.push(operations[i].in_amount)
+         tab_out.push(operations[i].out_amount)
+     }
+   
+   entree = sum(tab_in)
+   sortie = sum(tab_out)
+   
+ 
+   return {"entree": entree, "sortie":sortie}
+ }
+
+
+
 export function getSectionListDataStructure(criteria,sectionTitleCriteria, dataToFiltering){
 	
     let structured_data = []
