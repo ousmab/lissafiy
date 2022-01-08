@@ -534,7 +534,7 @@ function Activite({setOperation_dates}) {
                 let date_convert = String(moment(date, 'MMMM Do YYYY').format('YYYY-MM-DD'));
                 let montant_entree = operation_type == CATEGORY_IN ? onChangeMontant : 0
                 let monant_sortie = operation_type == CATEGORY_OUT ? onChangeMontant: 0
-                let tiers = onChangeTiers != null ? onChangeTiers.trim() : null
+                let tiers = onChangeTiers != null ? onChangeTiers.trim().toLowerCase() : null
                 let to_insert = [date_convert,
                                 category_selected, 
                                 onChangeNature.trim(), 

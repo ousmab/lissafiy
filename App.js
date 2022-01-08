@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Alert, PermissionsAndroid } from 'react-native';
+import { Alert, PermissionsAndroid, Share } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import XLSX from 'xlsx';
-import * as MediaLibrary from 'expo-media-library';
+
+
 import HomeScreen from './components/HomeScreen';
 import Menu from './components/Menu';
 
@@ -17,14 +18,37 @@ import { createCategorieTable } from './databases/categoryModel';
 import { createOperationTable} from './databases/operationModel';
 
 import Icon from "react-native-vector-icons/FontAwesome"
-import moment from 'moment';
+
 const Stack = createNativeStackNavigator();
 
 
 
 export default function App({ navigation }) {
 
+  const onShare = async (url) => {
+   
+    try {
+      const result = await Share.share({
+        title: "Lissafiy",
+        message: "Sauvegarde des données financières",
+        url: url,
+        subject: "sauvegarde",
+    });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+          Alert.alert('reussi','votre sauvegarde a été effectué avec succès !')
 
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      Alert.alert("Erreur ",error.message);
+    }
+  };
 
   const requestFileSystem = async () => {
     try {
@@ -66,9 +90,10 @@ export default function App({ navigation }) {
       const uri = FileSystem.cacheDirectory + file_name;
       //console.log(`Writing to ${JSON.stringify(uri)} with text: ${wbout}`);
 
-      
-      console.log("objectdd" ,uri)
-      try {
+      await onShare(uri)
+
+     
+     /* try {
         const asset = await MediaLibrary.createAssetAsync(uri);
         const album = await MediaLibrary.getAlbumAsync('Download');
         
@@ -79,7 +104,7 @@ export default function App({ navigation }) {
         }
       } catch (e) {
         console.log("erreur ", e)
-      }
+      }*/
 
 
       } else {
