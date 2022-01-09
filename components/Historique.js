@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, View, FlatList,SectionList,TouchableOpacity ,StyleSheet, StatusBar, Dimensions} from 'react-native';
-import TabSelectorAnimation from 'react-native-tab-selector'
-import { CheckBox} from 'react-native-elements';
+import { Text, View,SectionList,TouchableOpacity ,StyleSheet, StatusBar, Dimensions} from 'react-native';
+//import TabSelectorAnimation from 'react-native-tab-selector'
+//import { CheckBox} from 'react-native-elements';
 import { getAllOperations, getAllDays,getAllOperationsByDate } from '../databases/operationModel'
 import { getSectionListDataStructure } from '../utils';
-
-
+import { sumOperationsJour } from '../utils';
+import moment from 'moment';
 import EmptySectionList from './EmptySectionList';
 import { CATEGORY_IN } from '../databases/categoryModel';
 
@@ -140,9 +140,9 @@ function Historique({dates}) {
           }
           renderSectionHeader={({section})=>{
             return   (
-              <Text style={styles.header}>{section.title} (
-                <Text style={{ fontSize:15, color :"red", alignSelf:"flex-end" }} >  5000</Text> 
-                <Text style={{ fontSize:15, color :"green", alignSelf:"flex-end" }} > --   5000</Text> )
+                <Text style={styles.header}>{ moment(section.title).locale('fr').format('ll')} (
+                <Text style={{ fontSize:15, color :"#c21810", alignSelf:"flex-end" }} > {sumOperationsJour(section.title, data)['sortie'] } </Text> 
+                <Text style={{ fontSize:15, color :"#10c25d", alignSelf:"flex-end" }} > --  {sumOperationsJour(section.title, data)['entree'] }</Text> )
               </Text>
   
             )
